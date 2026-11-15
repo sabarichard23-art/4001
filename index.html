@@ -170,6 +170,18 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 #hand .card{touch-action:none}
 #hand .card.drag{transition:none;z-index:99!important;box-shadow:0 14px 26px rgba(0,0,0,.6)}
 #hand .card.drag.go{box-shadow:0 0 0 3px var(--brass),0 14px 26px rgba(0,0,0,.6)}
+.bub{position:absolute;z-index:6;background:#fff;color:var(--card-ink);border-radius:18px;padding:7px 14px;font-size:15px;font-weight:600;line-height:1.2;max-width:150px;text-align:center;
+  box-shadow:0 6px 16px rgba(0,0,0,.5);opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s;pointer-events:none}
+.bub.on{opacity:1;transform:scale(1)}
+.bub.big{font-size:34px;padding:4px 12px;line-height:1.15}
+.bub.num{font-family:var(--display);font-size:26px;font-weight:700;padding:2px 18px}
+.bub.p0{left:14px;bottom:10px}.bub.p1{right:-14px;top:calc(50% - 118px)}.bub.p2{left:calc(50% + 30px);top:-56px}.bub.p3{left:-14px;top:calc(50% - 118px)}
+#chatBtn{margin-left:auto;padding:6px 12px}
+#me .tally{margin-left:0}
+.pick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.pick.words{grid-template-columns:repeat(2,1fr)}
+.pick button{background:#fff;color:var(--card-ink);border:0;border-radius:12px;min-height:54px;font-size:30px;box-shadow:0 3px 0 #a99a78}
+.pick.words button{font-size:15px;font-weight:600;padding:8px}
 .box ul{margin:0 0 16px;padding-left:18px;color:var(--text);font-size:14px;line-height:1.5}
 @media (max-height:700px){#hand{height:132px}#hand .card{height:120px;width:84px}#hand .card .pip{font-size:48px}.av{width:50px;height:50px}.seat.top{top:-52px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -196,6 +208,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
       <p id="padHint"></p>
       <div class="grid" id="padGrid"></div>
     </div>
+    <div class="bub p0" id="bub0"></div><div class="bub p1" id="bub1"></div><div class="bub p2" id="bub2"></div><div class="bub p3" id="bub3"></div>
     <div id="msg" aria-live="polite"></div>
   </main>
   <footer>
@@ -611,6 +624,9 @@ if (typeof module !== 'undefined') module.exports = E;
   var nick = '', want = -1, myAct = 0, sentTid = -1, sheetKind = '';
   var conns = {}, code = '', net = '', lastHeard = 0, netGen = 0, hostName = '', lobbyDirty = false;
   var cid = '';
+  var EMOTES = ['\uD83D\uDE02','\uD83D\uDCAA','\uD83D\uDC4F','\uD83D\uDE0E','\uD83D\uDE2D','\uD83E\uDD14','\uD83D\uDE21','\uD83D\uDE4F','\uD83D\uDD25','\u2764\uFE0F','\uD83C\uDFF3\uFE0F','\uD83C\uDF82'];
+  var WORDS = ["It's OK", 'Sorry!', 'Faster please!', 'Thank you', 'Nice move', 'Congrats :)', 'Why?!', 'Hard luck :(', 'Well played', 'Good game', '\u064A\u0644\u0627', '\u0627\u0644\u0644\u0647 \u0628\u0627\u0644\u062E\u064A\u0631'];
+  var mySay = 0, sayC = 0, sayN = 0, saidBy = {}, seenSay = [0,0,0,0], prevBids = [null,null,null,null], bubT = [0,0,0,0], lastSaid = 0, chatTab = 'e';
   try { var sl = JSON.parse(localStorage.getItem(LKEY)); if (sl && sl.length === 4) lv = sl.map(function(x){ return Math.max(0, Math.min(3, x|0)); }); } catch(e){}
   try { nick = cleanName(localStorage.getItem(NKEY) || ''); } catch(e){}
   try { cid = localStorage.getItem(CKEY) || ''; } catch(e){}
@@ -875,6 +891,32 @@ if (typeof module !== 'undefined') module.exports = E;
       gen++; sched = -1; var keep = blank(g.seats, g.nm); g = keep; sheetKind = ''; $('sheet').hidden = true; show('lobby'); publish();
     };
   }
+  function bubble(p, text, cls, ms){
+    var k = pos(p), el = $('bub' + k);
+    el.textContent = text; el.className = 'bub p' + k + ' on' + (cls ? ' ' + cls : '');
+    clearTimeout(bubT[k]); bubT[k] = setTimeout(function(){ el.classList.remove('on'); }, ms || 3200);
+  }
+  function sayText(k, v){ return k === 'e' ? EMOTES[v] : WORDS[v]; }
+  function recordSay(p, k, v){
+    if ((k !== 'e' && k !== 'm') || v !== (v|0) || v < 0 || v >= (k === 'e' ? EMOTES : WORDS).length) return;
+    if (!g.say) g.say = [0,0,0,0];
+    g.say[p] = [k, v, ++sayN, Date.now()];
+    bubble(p, sayText(k, v), k === 'e' ? 'big' : '');
+    publish();
+  }
+  function say(k, v){
+    var now = Date.now(); if (now - lastSaid < 1200 || mySeat < 0 || !g) return; lastSaid = now;
+    if (mode === 'client') { mySay = {id:++sayC, k:k, v:v}; pushClient(); } else recordSay(mySeat, k, v);
+  }
+  function chatSheet(){
+    var h = '<h2>Say something</h2><div class="seg" style="grid-template-columns:1fr 1fr"><button type="button" data-tab="e" aria-pressed="' + (chatTab === 'e') +
+      '">Emotes</button><button type="button" data-tab="m" aria-pressed="' + (chatTab === 'm') + '">Messages</button></div><div class="pick' + (chatTab === 'm' ? ' words' : '') + '">';
+    (chatTab === 'e' ? EMOTES : WORDS).forEach(function(t, i){ h += '<button type="button" data-say="' + i + '">' + esc(t) + '</button>'; });
+    openSheet('chat', h + '</div><button class="second" id="go" type="button">Close</button>');
+    $('go').onclick = closeSheet;
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-tab]'), function(b){ b.onclick = function(){ chatTab = b.dataset.tab; chatSheet(); }; });
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-say]'), function(b){ b.onclick = function(){ say(chatTab, +b.dataset.say); closeSheet(); }; });
+  }
   function headerState(){
     $('botsBtn').hidden = mode === 'client';
     $('tableBtn').hidden = mode === 'solo';
@@ -934,6 +976,7 @@ if (typeof module !== 'undefined') module.exports = E;
     return {hs:hs, n:++outN, host:nick || 'Host', tid:g.tid, ph:g.phase, sc:g.scores, dl:g.dealer,
       b:g.bids.map(function(x){ return x == null ? -1 : x; }), w:g.won, tr:g.trick.map(function(t){ return [t.p, t.c]; }),
       tn:g.turn, wc:g.winCard, col:g.collect, note:g.note || 0, seats:g.seats, nm:g.nm, sum:g.sum || 0, lv:lv,
+      say:(g.say || [0,0,0,0]).map(function(x){ return x && Date.now() - x[3] < 4000 ? [x[0], x[1], x[2]] : 0; }),
       h:g.hands.map(function(h, i){ return i === seat ? h : h.length; })};
   }
   function publishTo(c){ if (mode === 'host' && g && conns[c]) send(PRE + code + '/s/' + c, stateFor(c)); }
@@ -947,7 +990,7 @@ if (typeof module !== 'undefined') module.exports = E;
       adopt(d);
     });
   }
-  function pushClient(){ if (mode === 'client') send(PRE + code + '/c', {cid:cid, sid:sid, n:++cn, nick:nick, want:want, act:myAct}); }
+  function pushClient(){ if (mode === 'client') send(PRE + code + '/c', {cid:cid, sid:sid, n:++cn, nick:nick, want:want, act:myAct, say:mySay}); }
   function sit(s){
     if (mode === 'client') { want = s; pushClient(); return; }
     if (mode !== 'host') return;
@@ -972,6 +1015,9 @@ if (typeof module !== 'undefined') module.exports = E;
       if (cur < 0) return;
       var n = cleanName(c.nick) || 'Friend';
       if (g.nm[cur] !== n) { g.nm[cur] = n; changed = true; }
+      var sy = c.say, key = pe.peer + c.sid;
+      if (!(key in saidBy)) saidBy[key] = sy && typeof sy === 'object' ? sy.id : 0;
+      else if (sy && typeof sy === 'object' && sy.id !== saidBy[key]) { saidBy[key] = sy.id; recordSay(cur, sy.k, sy.v); }
       var a = c.act;
       if (a && typeof a === 'object' && a.tid === g.tid && g.turn === cur) {
         if (a.k === 'b') placeBid(cur, a.v); else if (a.k === 'p') playCard(cur, a.v);
@@ -997,6 +1043,7 @@ if (typeof module !== 'undefined') module.exports = E;
       var scr = g.phase === 'lobby' ? 'lobby' : 'table';
       if (scr !== screen) { sheetKind = ''; $('sheet').hidden = true; show(scr); }
       render();
+      if (s.say && s.say.length === 4) s.say.forEach(function(x, p){ if (x && x[2] !== seenSay[p]) { seenSay[p] = x[2]; var t = sayText(x[0], x[1]|0); if (t) bubble(p, t, x[0] === 'e' ? 'big' : ''); } });
       if (sheetKind === 'seats') tableSheet();
       if (g.phase === 'end' && g.sum && prevPhase !== 'end' && sheetKind !== 'seats') showEnd();
       else if (g.phase !== 'end' && sheetKind === 'end') { sheetKind = ''; $('sheet').hidden = true; }
@@ -1058,7 +1105,9 @@ if (typeof module !== 'undefined') module.exports = E;
     var me = $('me');
     me.className = (g.bids[v] != null && g.won[v] >= g.bids[v] ? 'made' : '') + (g.turn === v ? ' turn' : '');
     me.innerHTML = avatar(v) + '<div class="txt"><strong>' + esc(nm(v)) + '</strong><span>' +
-      esc(g.dealer === mySeat ? 'You dealt' : nm(g.dealer) + ' dealt') + ' this round</span></div>' + tally(v);
+      esc(g.dealer === mySeat ? 'You dealt' : nm(g.dealer) + ' dealt') + ' this round</span></div>' + (mySeat >= 0 ? '<button class="ghost" id="chatBtn" type="button">Chat</button>' : '') + tally(v);
+    if ($('chatBtn')) $('chatBtn').onclick = chatSheet;
+    for (k = 0; k < 4; k++) { if (g.bids[k] != null && prevBids[k] == null && g.phase !== 'end') bubble(k, '' + g.bids[k], 'num', 1800); prevBids[k] = g.bids[k]; }
     var tr = $('trick'); tr.innerHTML = '';
     g.trick.forEach(function(t){
       var o = OFF[pos(t.p)], el = cardEl(t.c); el.style.left = o[0] + 'px'; el.style.top = o[1] + 'px';
