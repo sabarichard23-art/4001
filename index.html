@@ -108,7 +108,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 #hand{position:relative;height:172px}
 #hand .card{position:absolute;top:12px;width:106px;height:158px;border-radius:11px;padding:5px 0 0 5px;transition:transform .12s,filter .15s;box-shadow:-4px 0 8px rgba(0,0,0,.45),0 4px 10px rgba(0,0,0,.5)}
 #hand .card .rk{font-size:var(--rk,40px);letter-spacing:-1px}
-#hand .card .rk.ten{font-size:calc(var(--rk,40px)*.62);letter-spacing:-.1em;margin:calc(var(--rk,40px)*.18) 0 calc(var(--rk,40px)*.14)}
+#hand .card .rk.ten{display:inline-block;letter-spacing:-.05em;transform:scaleX(var(--ten,.6));transform-origin:left center;white-space:nowrap}
 #hand .card .st{font-size:31px;margin-left:-2px}
 #hand .card .pip{font-size:72px;right:8px}
 #hand .card.ok{transform:translateY(-12px)}
@@ -178,6 +178,10 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 .bub.p0{left:14px;bottom:10px}.bub.p1{right:-14px;top:calc(50% - 118px)}.bub.p2{left:calc(50% + 30px);top:-56px}.bub.p3{left:-14px;top:calc(50% - 118px)}
 #chatBtn{margin-left:auto;padding:6px 12px}
 #me .tally{margin-left:0}
+#hRec{margin:0;color:var(--muted);font-size:13px;text-align:center;line-height:1.5}
+.bub{max-width:190px;overflow-wrap:anywhere}
+.log{background:#0f1318;border-radius:12px;padding:10px 12px;margin:14px 0 0;max-height:190px;overflow:auto}
+.log p{margin:0 0 6px;color:var(--text);font-size:14px;overflow-wrap:anywhere}.log p:last-child{margin:0}.log b{color:var(--us);font-weight:600}
 .pick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
 .pick.words{grid-template-columns:repeat(2,1fr)}
 .pick button{background:#fff;color:var(--card-ink);border:0;border-radius:12px;min-height:54px;font-size:30px;box-shadow:0 3px 0 #a99a78}
@@ -228,6 +232,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
         <button class="second" type="submit">Join a table</button>
       </form>
       <p id="hNote" aria-live="polite"></p>
+      <p id="hRec"></p>
     </div>
   </div>
   <div id="lobby" class="screen" hidden><div class="box" id="lobbyBox"></div></div>
@@ -507,19 +512,20 @@ var E = (function () {
       var ok = true;
       for (i = 0; i < order.length; i++) {
         c = order[i]; var s = S(c), tot = 0, q;
-        for (q = 0; q < 4; q++) if (q !== me && cap[q] > 0 && !(useVoids && view.voids[q][s])) tot += cap[q];
+        for (q = 0; q < 4; q++) if (q !== me && cap[q] > 0 && !(useVoids && barred(q, c, s))) tot += cap[q];
         if (!tot) { ok = false; break; }
         var r = Math.random() * tot;
-        for (q = 0; q < 4; q++) if (q !== me && cap[q] > 0 && !(useVoids && view.voids[q][s])) {
+        for (q = 0; q < 4; q++) if (q !== me && cap[q] > 0 && !(useVoids && barred(q, c, s))) {
           r -= cap[q]; if (r < 0) { own[c] = q; cap[q]--; break; }
         }
       }
       if (ok) return own;
     }
     return useVoids ? sampleWorld(view, false) : own;
+    function barred(q3, card, s3) { return view.voids[q3][s3] || (view.caps && card > view.caps[q3][s3]); }
     function elig(card) {
       var n = 0, s2 = S(card);
-      for (var q2 = 0; q2 < 4; q2++) if (q2 !== me && !view.voids[q2][s2]) n++;
+      for (var q2 = 0; q2 < 4; q2++) if (q2 !== me && !barred(q2, card, s2)) n++;
       return n;
     }
   }
@@ -536,6 +542,16 @@ var E = (function () {
       w *= Math.exp(-0.22 * d * d);
     }
     return w;
+  }
+
+  // A player who is last to act, needs tricks, follows suit and still loses the trick to an opponent holds nothing higher in that suit.
+  function newCaps() { var c = []; for (var q = 0; q < 4; q++) c.push([12, 25, 38, 51]); return c; }
+  function noteCaps(caps, p, card, trickBefore, leader, bids, won) {
+    if (trickBefore.length !== 3) return;
+    var led = S(trickBefore[0]); if (S(card) !== led) return;
+    var wi = trickWinnerIdx(trickBefore), w = trickBefore[wi], wp = (leader + wi) & 3;
+    if (wp === ((p + 2) & 3) || S(w) !== led || card > w || bids[p] - won[p] <= 0) return;
+    if (w < caps[p][led]) caps[p][led] = w;
   }
 
   /* ---------- bot decisions ---------- */
@@ -625,7 +641,7 @@ var E = (function () {
   return {
     TR: TR, S: S, R: R, bidValue: bidValue, minBid: minBid, minTotal: minTotal, gameWinner: gameWinner,
     deal: deal, beats: beats, trickWinnerIdx: trickWinnerIdx, legalMoves: legalMoves,
-    sims: function () { return sims; }, policy: policy, estimate: estimate, chooseBid: chooseBid, choosePlay: choosePlay, shuffle: shuffle
+    sims: function () { return sims; }, newCaps: newCaps, noteCaps: noteCaps, policy: policy, estimate: estimate, chooseBid: chooseBid, choosePlay: choosePlay, shuffle: shuffle
   };
 })();
 if (typeof module !== 'undefined') module.exports = E;
@@ -639,7 +655,7 @@ if (typeof module !== 'undefined') module.exports = E;
   var SUITS = ['♠︎','♥︎','♦︎','♣︎'];
   var OFF = [[0,60],[66,0],[0,-60],[-66,0]];               // trick card offsets by screen position: bottom, right, top, left
   var LEVELS = ['Novice','Intermediate','Advanced','Expert'];
-  var KEY = 'solo400', LKEY = 'solo400levels', NKEY = 'solo400nick', CKEY = 'solo400cid', PRE = 't400x/';
+  var KEY = 'solo400', LKEY = 'solo400levels', NKEY = 'solo400nick', CKEY = 'solo400cid', RKEY = 'solo400rec', PRE = 't400x/';
   var g = null, gen = 0, sched = -1, lv = [3,3,3,3], screen = 'home';
   var mode = 'solo', mySeat = 0, myPeer = 'host', peersNow = [];
   var nick = '', want = -1, myAct = 0, sentTid = -1, sheetKind = '';
@@ -695,11 +711,11 @@ if (typeof module !== 'undefined') module.exports = E;
     g.bids = [null,null,null,null]; g.won = [0,0,0,0]; g.trick = []; g.winCard = -1; g.fresh = -1; g.collect = -1;
     g.leader = g.first; g.turn = g.first; g.phase = 'bid'; g.done = 0; g.note = null; g.sum = null; g.tid++;
     g.playedBy = new Int8Array(52).fill(-1);
-    g.voids = [0,1,2,3].map(function(){ return [false,false,false,false]; });
+    g.voids = [0,1,2,3].map(function(){ return [false,false,false,false]; }); g.caps = E.newCaps();
     render(); next();
   }
   function viewFor(p){
-    return {me:p, hand:g.hands[p], counts:g.hands.map(function(h){ return h.length; }), playedBy:g.playedBy, voids:g.voids,
+    return {me:p, hand:g.hands[p], counts:g.hands.map(function(h){ return h.length; }), playedBy:g.playedBy, voids:g.voids, caps:g.caps,
       bids:g.bids, trick:g.trick.map(function(t){ return t.c; }), leader:g.leader, won:g.won.slice(), scores:g.scores};
   }
   function next(){
@@ -730,6 +746,7 @@ if (typeof module !== 'undefined') module.exports = E;
     var cards = g.trick.map(function(t){ return t.c; });
     if (E.legalMoves(g.hands[p], cards).indexOf(c) < 0) return;
     if (cards.length && E.S(c) !== E.S(cards[0])) g.voids[p][E.S(cards[0])] = true;
+    E.noteCaps(g.caps, p, c, cards, g.leader, g.bids, g.won);
     g.hands[p].splice(g.hands[p].indexOf(c), 1); g.playedBy[c] = p; g.trick.push({p:p, c:c}); g.fresh = c; g.tid++;
     if (g.trick.length === 4) {
       var all = g.trick.map(function(t){ return t.c; }), wi = E.trickWinnerIdx(all), w = g.trick[wi].p;
@@ -752,7 +769,9 @@ if (typeof module !== 'undefined') module.exports = E;
     });
     g.dealer = (g.dealer + 1) & 3;
     g.sum = {rows:rows, win:E.gameWinner(g.scores)};
-    if (g.sum.win < 0) save(); else if (mode === 'solo') { try { localStorage.removeItem(KEY); } catch(e){} }
+    if (g.sum.win < 0) save(); else if (mode === 'solo') {
+      try { localStorage.removeItem(KEY); var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'), lk = 'L' + Math.min(lv[1], lv[3]); rec[lk] = rec[lk] || [0, 0]; rec[lk][g.sum.win === 0 ? 0 : 1]++; localStorage.setItem(RKEY, JSON.stringify(rec)); } catch(e){}
+    }
     render(); showEnd();
   }
 
@@ -761,6 +780,9 @@ if (typeof module !== 'undefined') module.exports = E;
     var s = load();
     $('hBots').textContent = s ? 'Continue with bots' : 'Play with bots';
     $('hNew').hidden = !s;
+    var lines = [];
+    try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); }); } catch(e){}
+    $('hRec').textContent = lines.length ? 'Your record against ' + lines.join(' \u00b7 ') : '';
   }
   function startSolo(fresh){
     closeNet(); mode = 'solo'; myPeer = 'host'; mySeat = 0; g = null;
@@ -917,12 +939,21 @@ if (typeof module !== 'undefined') module.exports = E;
     el.textContent = text; el.className = 'bub p' + k + ' on' + (cls ? ' ' + cls : '');
     clearTimeout(bubT[k]); bubT[k] = setTimeout(function(){ el.classList.remove('on'); }, ms || 3200);
   }
-  function sayText(k, v){ return k === 'e' ? EMOTES[v] : WORDS[v]; }
+  var chatLog = [];
+  function cleanText(t){ return String(t == null ? '' : t).replace(/[\u0000-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2066-\u2069]/g, '').trim().slice(0, 60); }
+  function sayText(k, v){ return k === 't' ? cleanText(v) : k === 'e' ? EMOTES[v|0] : WORDS[v|0]; }
+  function showSay(p, k, v){
+    var t = sayText(k, v); if (!t) return;
+    bubble(p, t, k === 'e' ? 'big' : '', k === 't' ? 5500 : 3200);
+    chatLog.push([p === mySeat ? 'You' : (g.nm[p] || BOT[p]), t]); if (chatLog.length > 30) chatLog.shift();
+    if (sheetKind === 'chat' && chatTab === 't' && document.activeElement !== $('chatIn')) chatSheet();
+  }
   function recordSay(p, k, v){
-    if ((k !== 'e' && k !== 'm') || v !== (v|0) || v < 0 || v >= (k === 'e' ? EMOTES : WORDS).length) return;
+    if (k === 't') { v = cleanText(v); if (!v) return; }
+    else if ((k !== 'e' && k !== 'm') || v !== (v|0) || v < 0 || v >= (k === 'e' ? EMOTES : WORDS).length) return;
     if (!g.say) g.say = [0,0,0,0];
     g.say[p] = [k, v, ++sayN, Date.now()];
-    bubble(p, sayText(k, v), k === 'e' ? 'big' : '');
+    showSay(p, k, v);
     publish();
   }
   function say(k, v){
@@ -930,13 +961,22 @@ if (typeof module !== 'undefined') module.exports = E;
     if (mode === 'client') { mySay = {id:++sayC, k:k, v:v}; pushClient(); } else recordSay(mySeat, k, v);
   }
   function chatSheet(){
-    var h = '<h2>Say something</h2><div class="seg" style="grid-template-columns:1fr 1fr"><button type="button" data-tab="e" aria-pressed="' + (chatTab === 'e') +
-      '">Emotes</button><button type="button" data-tab="m" aria-pressed="' + (chatTab === 'm') + '">Messages</button></div><div class="pick' + (chatTab === 'm' ? ' words' : '') + '">';
-    (chatTab === 'e' ? EMOTES : WORDS).forEach(function(t, i){ h += '<button type="button" data-say="' + i + '">' + esc(t) + '</button>'; });
-    openSheet('chat', h + '</div><button class="second" id="go" type="button">Close</button>');
+    var tabs = [['e','Emotes'],['m','Messages'],['t','Type']], h = '<h2>Say something</h2><div class="seg" style="grid-template-columns:repeat(3,1fr)">';
+    tabs.forEach(function(t){ h += '<button type="button" data-tab="' + t[0] + '" aria-pressed="' + (chatTab === t[0]) + '">' + t[1] + '</button>'; });
+    h += '</div>';
+    if (chatTab === 't') {
+      h += '<div class="log">' + (chatLog.length ? chatLog.slice(-8).map(function(x){ return '<p><b>' + esc(x[0]) + '</b> ' + esc(x[1]) + '</p>'; }).join('') : '<p>No messages yet.</p>') + '</div>';
+      h += '<form id="chatForm" class="joinrow"><input id="chatIn" maxlength="60" placeholder="Type a message" autocomplete="off" aria-label="Message" style="text-transform:none;letter-spacing:0"><button class="second" type="submit">Send</button></form>';
+    } else {
+      h += '<div class="pick' + (chatTab === 'm' ? ' words' : '') + '">';
+      (chatTab === 'e' ? EMOTES : WORDS).forEach(function(t, i){ h += '<button type="button" data-say="' + i + '">' + esc(t) + '</button>'; });
+      h += '</div>';
+    }
+    openSheet('chat', h + '<button class="second" id="go" type="button">Close</button>');
     $('go').onclick = closeSheet;
     Array.prototype.forEach.call($('box').querySelectorAll('[data-tab]'), function(b){ b.onclick = function(){ chatTab = b.dataset.tab; chatSheet(); }; });
     Array.prototype.forEach.call($('box').querySelectorAll('[data-say]'), function(b){ b.onclick = function(){ say(chatTab, +b.dataset.say); closeSheet(); }; });
+    if ($('chatForm')) $('chatForm').onsubmit = function(e){ e.preventDefault(); var t = cleanText($('chatIn').value); if (t) { say('t', t); closeSheet(); } };
   }
   function headerState(){
     $('botsBtn').hidden = mode === 'client';
@@ -1064,7 +1104,7 @@ if (typeof module !== 'undefined') module.exports = E;
       var scr = g.phase === 'lobby' ? 'lobby' : 'table';
       if (scr !== screen) { sheetKind = ''; $('sheet').hidden = true; show(scr); }
       render();
-      if (s.say && s.say.length === 4) s.say.forEach(function(x, p){ if (x && x[2] !== seenSay[p]) { seenSay[p] = x[2]; var t = sayText(x[0], x[1]|0); if (t) bubble(p, t, x[0] === 'e' ? 'big' : ''); } });
+      if (s.say && s.say.length === 4) s.say.forEach(function(x, p){ if (x && x[2] !== seenSay[p]) { seenSay[p] = x[2]; showSay(p, x[0], x[1]); } });
       if (sheetKind === 'seats') tableSheet();
       if (g.phase === 'end' && g.sum && prevPhase !== 'end' && sheetKind !== 'seats') showEnd();
       else if (g.phase !== 'end' && sheetKind === 'end') { sheetKind = ''; $('sheet').hidden = true; }
@@ -1206,7 +1246,9 @@ if (typeof module !== 'undefined') module.exports = E;
     var cw = window.innerHeight <= 700 ? 84 : 106;
     var step = n > 1 ? Math.min(cw * 0.7, (W - cw) / (n - 1)) : 0;
     var x0 = (W - (cw + step * (n - 1))) / 2;
-    box.style.setProperty('--rk', Math.round(Math.max(28, Math.min(48, ((n > 1 ? step : cw) - 6) / 0.46))) + 'px');
+    var rkPx = Math.round(Math.max(28, Math.min(48, ((n > 1 ? step : cw) - 6) / 0.46)));
+    box.style.setProperty('--rk', rkPx + 'px');
+
     cards.forEach(function(c, i){
       var el = cardEl(c, 'button'); el.type = 'button';
       el.style.left = (x0 + i * step) + 'px'; el.style.zIndex = i + 1;
@@ -1215,6 +1257,11 @@ if (typeof module !== 'undefined') module.exports = E;
         else { el.classList.add('no'); el.disabled = true; }
       } else el.disabled = true;
       box.appendChild(el);
+    });
+    // squeeze the two-digit 10 sideways, at full height, so it fits the visible strip of its card
+    Array.prototype.forEach.call(box.querySelectorAll('.rk.ten'), function(t){
+      var w = t.offsetWidth, room = (n > 1 ? step : cw) - 7;
+      t.style.transform = 'scaleX(' + Math.max(0.35, Math.min(1, room / (w || 1))).toFixed(3) + ')';
     });
   }
   window.addEventListener('resize', function(){ if (g) drawHand(); });
