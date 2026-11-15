@@ -597,7 +597,7 @@ var E = (function () {
 if (typeof module !== 'undefined') module.exports = E;
 
 </script>
-<script src="peerjs.min.js"></script>
+<script src="mqtt.min.js"></script>
 <script>
 (function(){
   var BOT = ['Sami', 'Dana', 'Rami', 'Tarek'];
@@ -605,11 +605,11 @@ if (typeof module !== 'undefined') module.exports = E;
   var SUITS = ['♠︎','♥︎','♦︎','♣︎'];
   var OFF = [[0,60],[66,0],[0,-60],[-66,0]];               // trick card offsets by screen position: bottom, right, top, left
   var LEVELS = ['Novice','Intermediate','Advanced','Expert'];
-  var KEY = 'solo400', LKEY = 'solo400levels', NKEY = 'solo400nick', CKEY = 'solo400cid', PRE = 't400x-';
+  var KEY = 'solo400', LKEY = 'solo400levels', NKEY = 'solo400nick', CKEY = 'solo400cid', PRE = 't400x/';
   var g = null, gen = 0, sched = -1, lv = [3,3,3,3], screen = 'home';
   var mode = 'solo', mySeat = 0, myPeer = 'host', peersNow = [];
   var nick = '', want = -1, myAct = 0, sentTid = -1, sheetKind = '';
-  var peer = null, conn = null, conns = {}, code = '', net = '', lastHeard = 0, retries = 0, netGen = 0, hostName = '', lobbyDirty = false;
+  var conns = {}, code = '', net = '', lastHeard = 0, netGen = 0, hostName = '', lobbyDirty = false;
   var cid = '';
   try { var sl = JSON.parse(localStorage.getItem(LKEY)); if (sl && sl.length === 4) lv = sl.map(function(x){ return Math.max(0, Math.min(3, x|0)); }); } catch(e){}
   try { nick = cleanName(localStorage.getItem(NKEY) || ''); } catch(e){}
@@ -783,8 +783,8 @@ if (typeof module !== 'undefined') module.exports = E;
     lobbyDirty = false;
     var h = '<h2>Waiting room</h2>', ready = g && (mode === 'host' ? net === 'open' : net === 'open' && g.phase === 'lobby');
     if (net === 'opening') h += '<p>Connecting…</p>';
-    else if (net === 'notfound') h += '<p>No table with the code ' + esc(code) + ' is open right now. Check the code with the host.</p>';
-    else if (net === 'error') h += '<p>Could not connect. Check your internet connection and try again.</p>';
+    else if (net === 'notfound') h += '<p>No table with the code ' + esc(code) + ' is answering. Ask the host to keep the game open on their screen. Still trying\u2026</p>';
+    else if (net === 'error') h += '<p>Could not connect. Check your internet connection, then go back and try again.</p>';
     else if (net === 'lost') h += '<p>Lost the connection to the host. Trying to reconnect…</p>';
     if (ready) {
       h += codeBar();
@@ -805,12 +805,12 @@ if (typeof module !== 'undefined') module.exports = E;
   function hostLobby(){
     closeNet(); mode = 'host'; myPeer = 'host'; mySeat = 0; gen++; sched = -1;
     g = blank(['host','','',''], [nick || 'Host','','','']);
-    show('lobby'); openHost(0);
+    show('lobby'); openHost();
   }
   function joinLobby(c){
     c = String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
     if (c.length !== 4) { $('hNote').textContent = 'Enter the 4-character table code.'; return; }
-    closeNet(); mode = 'client'; myPeer = cid; mySeat = -1; want = -1; myAct = 0; sentTid = -1; g = null; gen++; code = c; retries = 0;
+    closeNet(); mode = 'client'; myPeer = cid; mySeat = -1; want = -1; myAct = 0; sentTid = -1; g = null; gen++; code = c;
     show('lobby'); openClient();
   }
   function goHome(){
@@ -881,87 +881,73 @@ if (typeof module !== 'undefined') module.exports = E;
   }
 
   /* ---------- friends table: the host's device runs the game and sends each friend their own cards ---------- */
+  var BROKERS = ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt', 'wss://test.mosquitto.org:8081/mqtt'];
+  var links = [], hs = '', outN = 0, lastN = -1, lastHs = '', openedAt = 0, lostAt = 0, sid = rid(6), cn = 0;
+  function rid(n){ var r = ''; for (var i = 0; i < n; i++) r += 'abcdefghijklmnopqrstuvwxyz0123456789'[(Math.random() * 36) | 0]; return r; }
   function closeNet(){
     netGen++;
-    try { if (conn) conn.close(); } catch(e){}
-    try { if (peer) peer.destroy(); } catch(e){}
-    peer = null; conn = null; conns = {}; peersNow = []; net = '';
+    links.forEach(function(c){ try { c.end(true); } catch(e){} });
+    links = []; conns = {}; peersNow = []; net = '';
+  }
+  function anyUp(){ return links.some(function(c){ return c.connected; }); }
+  function send(topic, obj){
+    var str = JSON.stringify(obj);
+    links.forEach(function(c){ if (c.connected) { try { c.publish(topic, str); } catch(e){} } });
   }
   function mkCode(){ var s = '', a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for (var i = 0; i < 4; i++) s += a[(Math.random() * a.length) | 0]; return s; }
-  function openHost(tries){
-    if (typeof Peer === 'undefined') { net = 'error'; drawLobby(); return; }
-    var my = netGen; code = mkCode(); net = 'opening'; drawLobby();
-    var p = peer = new Peer(PRE + code);
-    p.on('open', function(){ if (my !== netGen) return; net = 'open'; drawLobby(); });
-    p.on('connection', function(c){
-      if (my !== netGen) return;
-      c.on('open', function(){ if (my !== netGen) return; conns[c.peer] = {c:c, msg:null, at:Date.now()}; syncPeers(); });
-      c.on('data', function(d){ if (my !== netGen || !conns[c.peer]) return; if (d && typeof d === 'object') { conns[c.peer].msg = d; conns[c.peer].at = Date.now(); syncPeers(); } });
-      c.on('close', function(){ if (my !== netGen) return; delete conns[c.peer]; syncPeers(); });
-      c.on('error', function(){ if (my !== netGen) return; delete conns[c.peer]; syncPeers(); });
+  // Every device connects to several public relay servers at once and sends on all of them, so one being down does not matter.
+  function openLinks(sub, onUp, onMsg){
+    var my = netGen;
+    if (typeof mqtt === 'undefined') { net = 'error'; drawLobby(); return; }
+    links = BROKERS.map(function(u){
+      var c;
+      try { c = mqtt.connect(u, {clientId:'t4' + rid(12), keepalive:20, reconnectPeriod:2500, connectTimeout:9000, clean:true}); }
+      catch(e){ return {connected:false, end:function(){}, publish:function(){}}; }
+      c.on('connect', function(){ if (my !== netGen) { try { c.end(true); } catch(e){} return; } try { c.subscribe(sub); } catch(e){} onUp(); });
+      c.on('message', function(t, p){
+        if (my !== netGen) return;
+        var d; try { d = JSON.parse(p.toString()); } catch(e){ return; }
+        if (d && typeof d === 'object') onMsg(d);
+      });
+      c.on('error', function(){});
+      return c;
     });
-    p.on('disconnected', function(){ if (my !== netGen) return; try { p.reconnect(); } catch(e){} });
-    p.on('error', function(e){
-      if (my !== netGen) return;
-      if (e && e.type === 'unavailable-id' && tries < 4) { try { p.destroy(); } catch(x){} openHost(tries + 1); return; }
-      if (net !== 'open') { net = 'error'; drawLobby(); }
+    setTimeout(function(){ if (my === netGen && net === 'opening' && !anyUp()) { net = 'error'; drawLobby(); } }, 12000);
+  }
+  function openHost(){
+    code = mkCode(); hs = rid(6); outN = 0; net = 'opening'; openedAt = Date.now(); drawLobby();
+    openLinks(PRE + code + '/c', function(){ if (net !== 'open') { net = 'open'; drawLobby(); } publish(); }, function(d){
+      if (mode !== 'host' || typeof d.cid !== 'string' || !/^[a-z0-9]{10}$/.test(d.cid) || typeof d.n !== 'number') return;
+      var k = conns[d.cid], fresh = !k;
+      if (k && k.sid === d.sid && d.n <= k.n) return;
+      conns[d.cid] = {msg:d, at:Date.now(), n:d.n, sid:d.sid};
+      syncPeers(fresh ? d.cid : '');
     });
   }
-  function syncPeers(){
-    var byCid = {}, now = Date.now();
-    Object.keys(conns).forEach(function(id){
-      var k = conns[id], m = k.msg;
-      if (!m || typeof m.cid !== 'string' || !/^[a-z0-9]{10}$/.test(m.cid)) return;
-      if (!byCid[m.cid] || byCid[m.cid].at < k.at) byCid[m.cid] = k;
-    });
-    peersNow = Object.keys(byCid).map(function(c){ return {peer:c, sameTab:false, kind:'viewer', presence:{t4c:byCid[c].msg}}; });
-    hostSync(); publish(); drawLobby();
-    if (sheetKind === 'seats') tableSheet();
+  function syncPeers(newCid){
+    peersNow = Object.keys(conns).map(function(c){ return {peer:c, presence:{t4c:conns[c].msg}}; });
+    hostSync();
+    if (newCid) { publishTo(newCid); drawLobby(); if (sheetKind === 'seats') tableSheet(); }
   }
   function stateFor(c){
     var seat = g.seats.indexOf(c);
-    return {host:nick || 'Host', tid:g.tid, ph:g.phase, sc:g.scores, dl:g.dealer,
+    return {hs:hs, n:++outN, host:nick || 'Host', tid:g.tid, ph:g.phase, sc:g.scores, dl:g.dealer,
       b:g.bids.map(function(x){ return x == null ? -1 : x; }), w:g.won, tr:g.trick.map(function(t){ return [t.p, t.c]; }),
       tn:g.turn, wc:g.winCard, col:g.collect, note:g.note || 0, seats:g.seats, nm:g.nm, sum:g.sum || 0, lv:lv,
       h:g.hands.map(function(h, i){ return i === seat ? h : h.length; })};
   }
-  function publish(){
-    if (mode !== 'host' || !g) return;
-    Object.keys(conns).forEach(function(id){
-      var k = conns[id];
-      if (!k.msg || !k.c.open) return;
-      try { k.c.send(stateFor(k.msg.cid)); } catch(e){}
-    });
-  }
+  function publishTo(c){ if (mode === 'host' && g && conns[c]) send(PRE + code + '/s/' + c, stateFor(c)); }
+  function publish(){ if (mode !== 'host' || !g) return; Object.keys(conns).forEach(publishTo); }
   function openClient(){
-    if (typeof Peer === 'undefined') { net = 'error'; drawLobby(); return; }
-    var my = ++netGen; net = retries ? 'lost' : 'opening'; drawLobby();
-    try { if (peer) peer.destroy(); } catch(e){}
-    var p = peer = new Peer();
-    p.on('open', function(){
-      if (my !== netGen) return;
-      var c = conn = p.connect(PRE + code, {reliable:true});
-      c.on('open', function(){ if (my !== netGen) return; net = 'open'; lastHeard = Date.now(); pushClient(); drawLobby(); });
-      c.on('data', function(d){ if (my !== netGen) return; lastHeard = Date.now(); retries = 0; if (net !== 'open') net = 'open'; adopt(d); });
-      c.on('close', function(){ if (my === netGen) lostHost(); });
-      c.on('error', function(){ if (my === netGen) lostHost(); });
+    net = 'opening'; lastN = -1; lastHs = ''; openedAt = Date.now(); lastHeard = 0; drawLobby();
+    openLinks(PRE + code + '/s/' + cid, function(){ pushClient(); }, function(d){
+      if (mode !== 'client' || typeof d.n !== 'number') return;
+      if (d.hs === lastHs && d.n <= lastN) return;
+      lastHs = d.hs; lastN = d.n; lastHeard = Date.now(); net = 'open';
+      adopt(d);
     });
-    p.on('error', function(e){
-      if (my !== netGen) return;
-      if (retries) { lostHost(); return; }
-      net = e && e.type === 'peer-unavailable' ? 'notfound' : 'error'; drawLobby();
-    });
-    setTimeout(function(){ if (my === netGen && net === 'opening') { net = 'error'; drawLobby(); } }, 15000);
   }
-  function lostHost(){
-    if (mode !== 'client') return;
-    if (retries >= 20) { goHome(); $('hNote').textContent = 'The table closed or the connection was lost.'; return; }
-    retries++; net = 'lost'; netGen++;
-    if (screen === 'lobby') drawLobby(); else $('msg').textContent = 'Lost the connection. Reconnecting…';
-    var my = netGen;
-    setTimeout(function(){ if (my === netGen && mode === 'client') openClient(); }, 3000);
-  }
-  function pushClient(){ if (mode === 'client' && conn && conn.open) { try { conn.send({cid:cid, nick:nick, want:want, act:myAct}); } catch(e){} } }
+  function pushClient(){ if (mode === 'client') send(PRE + code + '/c', {cid:cid, sid:sid, n:++cn, nick:nick, want:want, act:myAct}); }
   function sit(s){
     if (mode === 'client') { want = s; pushClient(); return; }
     if (mode !== 'host') return;
@@ -1020,17 +1006,22 @@ if (typeof module !== 'undefined') module.exports = E;
     var now = Date.now();
     if (mode === 'host') {
       var dropped = false;
-      Object.keys(conns).forEach(function(id){ if (now - conns[id].at > 20000) { try { conns[id].c.close(); } catch(e){} delete conns[id]; dropped = true; } });
-      if (dropped) syncPeers(); else publish();
+      Object.keys(conns).forEach(function(c){ if (now - conns[c].at > 20000) { delete conns[c]; dropped = true; } });
+      if (dropped) { syncPeers(''); drawLobby(); if (sheetKind === 'seats') tableSheet(); }
+      publish();
     } else if (mode === 'client') {
       pushClient();
-      if (net === 'open' && now - lastHeard > 14000) lostHost();
+      if (net === 'opening' && anyUp() && now - openedAt > 9000) { net = 'notfound'; drawLobby(); }
+      else if (net === 'open' && now - lastHeard > 12000) {
+        net = 'lost'; lostAt = now;
+        if (screen === 'lobby') drawLobby(); else $('msg').textContent = 'Lost the connection to the host. Reconnecting…';
+      } else if (net === 'lost' && now - lostAt > 180000) { goHome(); $('hNote').textContent = 'The table closed or the connection was lost.'; }
     }
   }, 3000);
   document.addEventListener('visibilitychange', function(){
-    if (document.visibilityState !== 'visible') return;
-    if (mode === 'client' && (net === 'open' || net === 'lost') && (!conn || !conn.open)) { retries = Math.max(retries, 1); netGen++; openClient(); }
-    if (mode === 'host' && peer && peer.disconnected) { try { peer.reconnect(); } catch(e){} }
+    if (document.visibilityState !== 'visible' || mode === 'solo') return;
+    links.forEach(function(c){ if (!c.connected && c.reconnect) { try { c.reconnect(); } catch(e){} } });
+    if (mode === 'host') publish(); else pushClient();
   });
 
   /* ---------- drawing ---------- */
