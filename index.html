@@ -311,6 +311,21 @@ var E = (function () {
       if (o === p) { len[s]++; if (lo[s] < 0) lo[s] = c; hi[s] = c; } else out[s]++;
     }
     var o1T = hasSuit(own, o1, TR), o2T = hasSuit(own, o2, TR);
+    var partner = (p + 2) & 3;
+    if (need <= 0 && pneed > 0) {
+      var feed = -1, fv = -1;
+      for (s = 0; s < 4; s++) {
+        if (s === TR || !len[s]) continue;
+        var holder = -1, sc = 0;
+        for (c = s * 13 + 12; c >= s * 13; c--) if (own[c] >= 0 && own[c] !== p) { holder = own[c]; break; }
+        if (holder === partner) sc = 3;
+        else if (!hasSuit(own, partner, s) && hasSuit(own, partner, TR)) sc = 2;
+        else sc = 1;
+        if (sc > fv || (sc === fv && R(lo[s]) < R(feed))) { fv = sc; feed = lo[s]; }
+      }
+      if (feed >= 0) return feed;
+      if (len[TR]) return lo[TR];
+    }
     if (need > 0 || oppNeed) {
       var best = -1, bs = -1;
       for (s = 0; s < 4; s++) {
@@ -357,6 +372,12 @@ var E = (function () {
     var last = trick.length === 3, partnerWin = wp === partner;
     var wantOver = partnerWin ? (need > 0 && pneed <= 0) : true;
     var c, base = led * 13, lo = -1, hi = -1;
+    if (!partnerWin && need <= 0 && pneed > 0 && trick.length < 2) {
+      var can = false;
+      if (hasSuit(own, partner, led)) { if (S(w) === led) for (c = w + 1; c < base + 13; c++) if (own[c] === partner) { can = true; break; } }
+      else if (led !== TR) { for (c = (S(w) === TR ? w + 1 : TR * 13); c < TR * 13 + 13; c++) if (own[c] === partner) { can = true; break; } }
+      if (can) wantOver = false;
+    }
     for (c = base; c < base + 13; c++) if (own[c] === p) { if (lo < 0) lo = c; hi = c; }
     if (lo >= 0) {
       if (!wantOver) return lo;
