@@ -1,0 +1,19 @@
+{
+  "name": "four-hundred",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The card game 400, as a web app and an iPhone app",
+  "scripts": {
+    "web": "node scripts/copy-web.js",
+    "ios": "node scripts/copy-web.js && npx cap sync ios",
+    "open": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}
