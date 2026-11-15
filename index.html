@@ -992,7 +992,7 @@ if (typeof module !== 'undefined') module.exports = E;
   }
   function headerState(){
     $('botsBtn').hidden = mode === 'client';
-    $('tableBtn').hidden = mode === 'solo';
+    $('tableBtn').hidden = false; $('tableBtn').textContent = mode === 'solo' ? 'Invite' : 'Table';
   }
 
   /* ---------- friends table: the host's device runs the game and sends each friend their own cards ---------- */
@@ -1288,7 +1288,11 @@ if (typeof module !== 'undefined') module.exports = E;
   };
   $('rulesBtn').onclick = rulesSheet;
   $('botsBtn').onclick = botsSheet;
-  $('tableBtn').onclick = tableSheet;
+  $('tableBtn').onclick = function(){
+    // from a game against bots: open the same game to friends, who can take over bot chairs
+    if (mode === 'solo' && g) { netGen++; mode = 'host'; g.nm[mySeat] = nick || 'Host'; openHost(); headerState(); }
+    tableSheet();
+  };
   $('hBots').onclick = function(){ startSolo(false); };
   $('hNew').onclick = function(){ startSolo(true); };
   $('hFriends').onclick = hostLobby;
