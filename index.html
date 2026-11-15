@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1014">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,10 +12,14 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>400</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-condensed-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-condensed-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/barlow-condensed-latin-700-normal.woff2) format('woff2')}
 :root{
   /* layout: one fixed screen. slim score bar, a railed felt table with three seated players, a full-width hand of large cards along the bottom */
   --ink:#0d1014; --panel:#1a1f27; --line:#2b323c;
@@ -31,7 +35,7 @@ html,body{height:100%;margin:0}
 body{background:radial-gradient(ellipse at 50% 0,#1b2029,var(--ink) 60%) var(--ink);color:var(--text);font-family:var(--body);font-size:15px;-webkit-tap-highlight-color:transparent;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
-#app{height:100%;max-width:540px;margin:0 auto;display:flex;flex-direction:column;position:relative}
+#app{height:100%;max-width:540px;margin:0 auto;display:flex;flex-direction:column;position:relative;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 
 header{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
 .brand{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:.5px;line-height:1;margin-right:auto;display:flex;align-items:baseline;gap:8px}
@@ -143,7 +147,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 .chair button{background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;font-weight:600}
 .second{width:100%;background:transparent;border:1px solid var(--line);border-radius:12px;padding:12px;font-weight:600;font-size:15px;margin-top:8px}
 #watch{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:14px;padding:0 24px}
-.screen{position:absolute;inset:0;z-index:8;background:radial-gradient(ellipse at 50% 20%,#17513c,var(--ink) 65%) var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;overflow:auto}
+.screen{position:absolute;inset:0;padding-top:calc(24px + env(safe-area-inset-top))!important;z-index:8;background:radial-gradient(ellipse at 50% 20%,#17513c,var(--ink) 65%) var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;overflow:auto}
 .screen[hidden],.ghost[hidden],#hNew[hidden]{display:none}
 .logo{font-family:var(--display);font-weight:700;font-size:110px;line-height:.9;letter-spacing:-2px;color:var(--paper);text-shadow:0 6px 24px rgba(0,0,0,.5)}
 .tag{color:var(--muted);margin:8px 0 34px;font-size:15px}
@@ -178,6 +182,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 .bub.p0{left:14px;bottom:10px}.bub.p1{right:-14px;top:calc(50% - 118px)}.bub.p2{left:calc(50% + 30px);top:-56px}.bub.p3{left:-14px;top:calc(50% - 118px)}
 #chatBtn{margin-left:auto;padding:6px 12px}
 #me .tally{margin-left:0}
+p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--muted)}
 #hRec{margin:0;color:var(--muted);font-size:13px;text-align:center;line-height:1.5}
 .bub{max-width:190px;overflow-wrap:anywhere}
 .log{background:#0f1318;border-radius:12px;padding:10px 12px;margin:14px 0 0;max-height:190px;overflow:auto}
@@ -233,6 +238,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
       </form>
       <p id="hNote" aria-live="polite"></p>
       <p id="hRec"></p>
+      <p class="fine"><a href="privacy.html">Privacy</a></p>
     </div>
   </div>
   <div id="lobby" class="screen" hidden><div class="box" id="lobbyBox"></div></div>
@@ -669,6 +675,9 @@ if (typeof module !== 'undefined') module.exports = E;
   try { cid = localStorage.getItem(CKEY) || ''; } catch(e){}
   if (!/^[a-z0-9]{10}$/.test(cid)) { cid = ''; for (var ci = 0; ci < 10; ci++) cid += 'abcdefghijklmnopqrstuvwxyz0123456789'[(Math.random() * 36) | 0]; try { localStorage.setItem(CKEY, cid); } catch(e){} }
 
+  var CAP = window.Capacitor, NATIVE = !!(CAP && CAP.isNativePlatform && CAP.isNativePlatform());
+  function buzz(){ try { if (NATIVE && CAP.Plugins && CAP.Plugins.Haptics) CAP.Plugins.Haptics.impact({style:'LIGHT'}); } catch(e){} }
+  var buzzedTid = -1;
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return '&#' + c.charCodeAt(0) + ';'; }); }
   function cleanName(t){ return String(t == null ? '' : t).replace(/[^\w À-ɏ؀-ۿ.'-]/g, '').trim().slice(0, 12); }
@@ -943,13 +952,14 @@ if (typeof module !== 'undefined') module.exports = E;
   function cleanText(t){ return String(t == null ? '' : t).replace(/[\u0000-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2066-\u2069]/g, '').trim().slice(0, 60); }
   function sayText(k, v){ return k === 't' ? cleanText(v) : k === 'e' ? EMOTES[v|0] : WORDS[v|0]; }
   function showSay(p, k, v){
+    if (k === 't' && NATIVE) return;
     var t = sayText(k, v); if (!t) return;
     bubble(p, t, k === 'e' ? 'big' : '', k === 't' ? 5500 : 3200);
     chatLog.push([p === mySeat ? 'You' : (g.nm[p] || BOT[p]), t]); if (chatLog.length > 30) chatLog.shift();
     if (sheetKind === 'chat' && chatTab === 't' && document.activeElement !== $('chatIn')) chatSheet();
   }
   function recordSay(p, k, v){
-    if (k === 't') { v = cleanText(v); if (!v) return; }
+    if (k === 't') { if (NATIVE) return; v = cleanText(v); if (!v) return; }
     else if ((k !== 'e' && k !== 'm') || v !== (v|0) || v < 0 || v >= (k === 'e' ? EMOTES : WORDS).length) return;
     if (!g.say) g.say = [0,0,0,0];
     g.say[p] = [k, v, ++sayN, Date.now()];
@@ -961,7 +971,9 @@ if (typeof module !== 'undefined') module.exports = E;
     if (mode === 'client') { mySay = {id:++sayC, k:k, v:v}; pushClient(); } else recordSay(mySeat, k, v);
   }
   function chatSheet(){
-    var tabs = [['e','Emotes'],['m','Messages'],['t','Type']], h = '<h2>Say something</h2><div class="seg" style="grid-template-columns:repeat(3,1fr)">';
+    var tabs = NATIVE ? [['e','Emotes'],['m','Messages']] : [['e','Emotes'],['m','Messages'],['t','Type']];
+    if (NATIVE && chatTab === 't') chatTab = 'e';
+    var h = '<h2>Say something</h2><div class="seg" style="grid-template-columns:repeat(' + tabs.length + ',1fr)">';
     tabs.forEach(function(t){ h += '<button type="button" data-tab="' + t[0] + '" aria-pressed="' + (chatTab === t[0]) + '">' + t[1] + '</button>'; });
     h += '</div>';
     if (chatTab === 't') {
@@ -1203,6 +1215,7 @@ if (typeof module !== 'undefined') module.exports = E;
         grid.appendChild(bt);
       })(i);
     }
+    if (myTurnNow() && buzzedTid !== g.tid && screen === 'table') { buzzedTid = g.tid; buzz(); }
     drawHand(); headerState();
     if (screen === 'lobby') drawLobby();
     publish();

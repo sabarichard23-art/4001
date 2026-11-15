@@ -1,0 +1,10 @@
+{
+  "appId": "com.richardsaba.tarneeb400",
+  "appName": "400",
+  "webDir": "www",
+  "backgroundColor": "#0d1014",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0d1014"
+  }
+}
