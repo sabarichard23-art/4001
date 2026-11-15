@@ -47,7 +47,7 @@ header{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
 .team b{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 .team b.neg{color:var(--them)}
 
-#table{flex:1;min-height:0;margin:22px 8px 0;border-radius:34px;position:relative;border:8px solid transparent;
+#table{flex:1;min-height:0;margin:66px 18px 0;border-radius:34px;position:relative;border:8px solid transparent;
   background:radial-gradient(ellipse at 50% 40%,var(--felt-hi),var(--felt) 72%) padding-box,linear-gradient(165deg,var(--rail-a),var(--rail-b)) border-box;
   box-shadow:0 14px 30px rgba(0,0,0,.6),inset 0 0 50px rgba(0,0,0,.4)}
 #table::before{content:"";position:absolute;inset:9px;border-radius:22px;border:1.5px dashed rgba(255,255,255,.16);pointer-events:none}
@@ -55,9 +55,9 @@ header{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
   background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);background-size:5px 5px}
 
 .seat{position:absolute;width:78px;display:flex;flex-direction:column;align-items:center;z-index:2}
-.seat.top{top:-26px;left:50%;margin-left:-39px}
-.seat.left{left:0;top:30%;margin-top:-70px}
-.seat.right{right:0;top:30%;margin-top:-70px}
+.seat.top{top:-60px;left:50%;margin-left:-39px}
+.seat.left{left:-24px;top:50%;margin-top:-58px}
+.seat.right{right:-24px;top:50%;margin-top:-58px}
 .fan{position:absolute;top:-10px;left:50%;width:0;height:0}
 .fan i{position:absolute;left:-13px;top:0;width:26px;height:38px;border-radius:4px;transform-origin:50% 120%;
   background:repeating-linear-gradient(45deg,rgba(255,255,255,.09) 0 3px,transparent 3px 6px),var(--back);border:1.5px solid #f3ead6;box-shadow:0 1px 3px rgba(0,0,0,.5)}
@@ -73,7 +73,7 @@ header{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
 
 #trump{position:absolute;left:18px;bottom:16px;font-size:11px;color:rgba(240,235,225,.7);line-height:1.2;z-index:1}
 #trump b{display:block;font-size:22px;color:#ff8f86;line-height:1}
-#trick{position:absolute;left:50%;top:60%;width:0;height:0;z-index:1}
+#trick{position:absolute;left:50%;top:50%;width:0;height:0;z-index:1}
 #trick .card{position:absolute;margin:-52px 0 0 -37px}
 #trick .card.in{animation:slide .22s ease-out}
 #trick .card.out{animation:collect .32s ease-in forwards}
@@ -89,7 +89,7 @@ header{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
 .card .pip{position:absolute;right:6px;bottom:0;font-size:50px;line-height:1.1;font-family:"Segoe UI Symbol","Apple Symbols",sans-serif;font-weight:400}
 .card.win{box-shadow:0 0 0 3px var(--brass),0 0 18px rgba(227,189,106,.8)}
 
-#pad{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0e2a20,#081710);border-radius:20px;padding:14px 14px 16px;width:236px;z-index:5;border:1px solid rgba(227,189,106,.45);box-shadow:0 12px 30px rgba(0,0,0,.6)}
+#pad{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#0e2a20,#081710);border-radius:20px;padding:14px 14px 16px;width:224px;z-index:5;border:1px solid rgba(227,189,106,.45);box-shadow:0 12px 30px rgba(0,0,0,.6)}
 #pad h2{margin:0;font-family:var(--display);font-size:24px;font-weight:700;text-align:center}
 #pad p{margin:2px 0 12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12);font-size:12px;color:var(--muted);text-align:center}
 #pad .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
@@ -143,8 +143,35 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 .chair button{background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;font-weight:600}
 .second{width:100%;background:transparent;border:1px solid var(--line);border-radius:12px;padding:12px;font-weight:600;font-size:15px;margin-top:8px}
 #watch{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:14px;padding:0 24px}
+.screen{position:absolute;inset:0;z-index:8;background:radial-gradient(ellipse at 50% 20%,#17513c,var(--ink) 65%) var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;overflow:auto}
+.screen[hidden],.ghost[hidden],#hNew[hidden]{display:none}
+.logo{font-family:var(--display);font-weight:700;font-size:110px;line-height:.9;letter-spacing:-2px;color:var(--paper);text-shadow:0 6px 24px rgba(0,0,0,.5)}
+.tag{color:var(--muted);margin:8px 0 34px;font-size:15px}
+.stack{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
+.stack .second{margin-top:0}
+.primary.alt{background:linear-gradient(180deg,#7fdcbc,#4fb293);box-shadow:0 3px 0 #2c7560}
+.joinrow{display:flex;gap:8px;margin-top:14px}
+.joinrow input{flex:1;min-width:0;background:#0f1318;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:16px;color:var(--text);text-transform:uppercase;letter-spacing:2px}
+.joinrow .second{width:auto;white-space:nowrap;padding:12px 14px}
+#hNote{min-height:20px;margin:0;color:var(--them);font-size:13px;text-align:center}
+#lobby{justify-content:flex-start}
+#lobby .box{margin:auto 0}
+.codebar{display:flex;align-items:center;gap:12px;background:#0f1318;border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.codebar div{flex:1;display:flex;flex-direction:column}.codebar span{font-size:12px;color:var(--muted)}
+.codebar b{font-family:var(--display);font-size:32px;letter-spacing:4px;line-height:1}
+.codebar .second{width:auto;margin:0;padding:10px 14px;border-color:var(--brass);color:var(--brass)}
+.chair select{background:#1a1f27;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 4px;font:inherit;font-size:13px;max-width:104px}
+#board{position:absolute;left:12px;top:50px;z-index:3;display:grid;grid-template-columns:34px 30px 34px;grid-template-rows:24px 22px 24px;gap:2px;align-items:center;justify-items:center;
+  background:rgba(13,16,20,.82);border:1px solid var(--line);border-radius:14px;padding:5px 6px;box-shadow:0 4px 10px rgba(0,0,0,.45)}
+#board b{font-family:var(--display);font-weight:700;font-size:20px;line-height:1;font-variant-numeric:tabular-nums;min-width:30px;text-align:center;padding:2px 3px;border-radius:7px;background:#0a0d11;color:var(--us)}
+#board b.o{color:var(--them)}
+#board .t{grid-column:2;grid-row:1}#board .l{grid-column:1;grid-row:2}#board .r{grid-column:3;grid-row:2}#board .m{grid-column:2;grid-row:3}
+#board i{grid-column:2;grid-row:2;width:24px;height:16px;border-radius:5px;background:var(--felt-hi);border:2px solid var(--rail-a);display:block}
+#hand .card{touch-action:none}
+#hand .card.drag{transition:none;z-index:99!important;box-shadow:0 14px 26px rgba(0,0,0,.6)}
+#hand .card.drag.go{box-shadow:0 0 0 3px var(--brass),0 14px 26px rgba(0,0,0,.6)}
 .box ul{margin:0 0 16px;padding-left:18px;color:var(--text);font-size:14px;line-height:1.5}
-@media (max-height:700px){#hand{height:132px}#hand .card{height:120px;width:84px}#hand .card .pip{font-size:48px}.av{width:50px;height:50px}.seat.top{top:-22px}}
+@media (max-height:700px){#hand{height:132px}#hand .card{height:120px;width:84px}#hand .card .pip{font-size:48px}.av{width:50px;height:50px}.seat.top{top:-52px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -154,10 +181,10 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
     <div class="brand">400</div>
     <button class="ghost" id="rulesBtn" type="button">Rules</button>
     <button class="ghost" id="botsBtn" type="button">Bots</button>
-    <button class="ghost" id="friendsBtn" type="button">Friends</button>
-    <button class="ghost" id="newBtn" type="button">New</button>
+    <button class="ghost" id="tableBtn" type="button" hidden>Table</button>
+    <button class="ghost" id="homeBtn" type="button">Home</button>
   </header>
-  <section id="scores" aria-label="Scores"></section>
+  <div id="board" aria-label="Scores by seat"></div>
   <main id="table">
     <div class="seat top us" id="seat2"></div>
     <div class="seat left" id="seat3"></div>
@@ -176,6 +203,21 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
     <div id="hand"></div>
   </footer>
   <div id="sheet" hidden><div class="box" id="box"></div></div>
+  <div id="home" class="screen">
+    <div class="logo">400</div>
+    <p class="tag">Hearts are trump. First to 41.</p>
+    <div class="stack">
+      <button class="primary" id="hBots" type="button">Play with bots</button>
+      <button class="second" id="hNew" type="button" hidden>Start a new game with bots</button>
+      <button class="primary alt" id="hFriends" type="button">Play with friends</button>
+      <form id="hJoin" class="joinrow">
+        <input id="hCode" maxlength="4" placeholder="Table code" autocapitalize="characters" autocomplete="off" aria-label="Table code">
+        <button class="second" type="submit">Join a table</button>
+      </form>
+      <p id="hNote" aria-live="polite"></p>
+    </div>
+  </div>
+  <div id="lobby" class="screen" hidden><div class="box" id="lobbyBox"></div></div>
 </div>
 <script>
 /* 400 engine + bots. Cards: id 0..51, suit = id/13 (0 spades, 1 hearts, 2 diamonds, 3 clubs), rank = id%13 (0 = two, 12 = ace). */
@@ -555,6 +597,7 @@ var E = (function () {
 if (typeof module !== 'undefined') module.exports = E;
 
 </script>
+<script src="peerjs.min.js"></script>
 <script>
 (function(){
   var BOT = ['Sami', 'Dana', 'Rami', 'Tarek'];
@@ -562,24 +605,29 @@ if (typeof module !== 'undefined') module.exports = E;
   var SUITS = ['♠︎','♥︎','♦︎','♣︎'];
   var OFF = [[0,60],[66,0],[0,-60],[-66,0]];               // trick card offsets by screen position: bottom, right, top, left
   var LEVELS = ['Novice','Intermediate','Advanced','Expert'];
-  var KEY = 'solo400', LKEY = 'solo400levels', NKEY = 'solo400nick';
-  var g = null, gen = 0, sched = -1, lv = [3,3,3,3];
-  var mode = 'solo', mySeat = 0, myPeer = 'me', room = null, peersNow = [], hostPeer = null, openHost = null;
-  var nick = '', want = -1, myAct = 0, sentTid = -1, sheetKind = '', friendsSig = '';
+  var KEY = 'solo400', LKEY = 'solo400levels', NKEY = 'solo400nick', CKEY = 'solo400cid', PRE = 't400x-';
+  var g = null, gen = 0, sched = -1, lv = [3,3,3,3], screen = 'home';
+  var mode = 'solo', mySeat = 0, myPeer = 'host', peersNow = [];
+  var nick = '', want = -1, myAct = 0, sentTid = -1, sheetKind = '';
+  var peer = null, conn = null, conns = {}, code = '', net = '', lastHeard = 0, retries = 0, netGen = 0, hostName = '', lobbyDirty = false;
+  var cid = '';
   try { var sl = JSON.parse(localStorage.getItem(LKEY)); if (sl && sl.length === 4) lv = sl.map(function(x){ return Math.max(0, Math.min(3, x|0)); }); } catch(e){}
   try { nick = cleanName(localStorage.getItem(NKEY) || ''); } catch(e){}
+  try { cid = localStorage.getItem(CKEY) || ''; } catch(e){}
+  if (!/^[a-z0-9]{10}$/.test(cid)) { cid = ''; for (var ci = 0; ci < 10; ci++) cid += 'abcdefghijklmnopqrstuvwxyz0123456789'[(Math.random() * 36) | 0]; try { localStorage.setItem(CKEY, cid); } catch(e){} }
 
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return '&#' + c.charCodeAt(0) + ';'; }); }
   function cleanName(t){ return String(t == null ? '' : t).replace(/[^\w À-ɏ؀-ۿ.'-]/g, '').trim().slice(0, 12); }
   function later(fn, ms){ var t = gen; setTimeout(function(){ if (t === gen) fn(); }, ms); }
-  function save(){ if (mode !== 'solo') return; try { localStorage.setItem(KEY, JSON.stringify({scores:g.scores, dealer:g.dealer})); } catch(e){} }
+  function save(){ if (mode !== 'solo' || !g) return; try { localStorage.setItem(KEY, JSON.stringify({scores:g.scores, dealer:g.dealer})); } catch(e){} }
   function load(){ try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.scores && s.scores.length === 4 && E.gameWinner(s.scores) < 0) return s; } catch(e){} return null; }
   function isBot(p){ return g.seats[p] === ''; }
   function nm(p){ return p === mySeat ? 'You' : (g.nm[p] || BOT[p]); }
   function view(){ return mySeat >= 0 ? mySeat : 0; }
   function pos(p){ return (p - view() + 4) & 3; }
   function fmt(n){ return n < 0 ? '−' + (-n) : '' + n; }
+  function show(name){ screen = name; $('home').hidden = name !== 'home'; $('lobby').hidden = name !== 'lobby'; if (name === 'home') drawHome(); if (name === 'lobby') drawLobby(); if (name === 'table') drawHand(); headerState(); }
 
   var AV = [
     {bg:'#2b8f78', shirt:'#f0ebe1', skin:'#e2b089', hair:'#2a2019', extra:'<path d="M25 34c0-11 7-17 15-17s15 6 15 17c-3-6-8-9-15-9s-12 3-15 9z"/>'},
@@ -594,11 +642,15 @@ if (typeof module !== 'undefined') module.exports = E;
       '<g fill="' + a.hair + '">' + a.extra + '</g></svg></div>';
   }
 
-  /* ---------- game flow (runs on your device when you play alone or host) ---------- */
+  /* ---------- game flow (runs on your device when you play bots or host a table) ---------- */
+  function blank(seats, names){
+    return {scores:[0,0,0,0], dealer:(Math.random()*4)|0, seats:seats, nm:names, tid:0, phase:'lobby', hands:[[],[],[],[]],
+      bids:[null,null,null,null], won:[0,0,0,0], trick:[], turn:-1, winCard:-1, collect:-1, note:null, sum:null, fresh:-1, done:0};
+  }
   function newGame(){
     gen++; sched = -1;
     var seats = g ? g.seats : [myPeer,'','',''], names = g ? g.nm : ['','','',''];
-    g = {scores:[0,0,0,0], dealer:(Math.random()*4)|0, seats:seats, nm:names, tid:0};
+    g = blank(seats, names);
     save(); startRound();
   }
   function startRound(){
@@ -614,7 +666,7 @@ if (typeof module !== 'undefined') module.exports = E;
       bids:g.bids, trick:g.trick.map(function(t){ return t.c; }), leader:g.leader, won:g.won.slice(), scores:g.scores};
   }
   function next(){
-    if (mode === 'client') return;
+    if (mode === 'client' || !g) return;
     var p = g.turn;
     if (p < 0 || (g.phase !== 'bid' && g.phase !== 'play')) return;
     if (!isBot(p)) { render(); return; }
@@ -667,10 +719,111 @@ if (typeof module !== 'undefined') module.exports = E;
     render(); showEnd();
   }
 
+  /* ---------- home and waiting room ---------- */
+  function drawHome(){
+    var s = load();
+    $('hBots').textContent = s ? 'Continue with bots' : 'Play with bots';
+    $('hNew').hidden = !s;
+  }
+  function startSolo(fresh){
+    closeNet(); mode = 'solo'; myPeer = 'host'; mySeat = 0; g = null;
+    var s = fresh ? null : load();
+    show('table');
+    if (s) { g = blank([myPeer,'','',''], ['','','','']); g.scores = s.scores; g.dealer = s.dealer; gen++; sched = -1; startRound(); } else newGame();
+  }
+  function chairsHtml(){
+    var h = '<div class="chairs">';
+    [0,2,1,3].forEach(function(p){
+      var mine = p === mySeat, bot = isBot(p), who = mine ? (nick || 'You') + ' (you)' : bot ? BOT[p] + ', bot' : (g.nm[p] || 'Friend'), ctl = '';
+      if (mine) ctl = '<button type="button" data-stand="1">Stand up</button>';
+      else if (bot) {
+        if (mode === 'host') {
+          ctl = '<select data-lv="' + p + '" id="lv' + p + '" aria-label="Skill of ' + BOT[p] + '">';
+          LEVELS.forEach(function(n, i){ ctl += '<option value="' + i + '"' + (lv[p] === i ? ' selected' : '') + '>' + n + '</option>'; });
+          ctl += '</select>';
+        }
+        ctl += '<button type="button" data-sit="' + p + '">Sit here</button>';
+      }
+      h += '<div class="chair' + (p & 1 ? ' b' : '') + '"><div><strong>' + esc(who) + '</strong><span>Team ' + (p & 1 ? '2' : '1') +
+        (bot && mode !== 'host' ? ', ' + LEVELS[lv[p]].toLowerCase() : '') + '</span></div>' + ctl + '</div>';
+    });
+    return h + '</div>';
+  }
+  function wireChairs(root){
+    Array.prototype.forEach.call(root.querySelectorAll('.chair button'), function(b){
+      b.onclick = function(){ sit(b.dataset.stand ? -1 : +b.dataset.sit); };
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.chair select'), function(s){
+      s.onchange = function(){ lv[+s.dataset.lv] = +s.value; try { localStorage.setItem(LKEY, JSON.stringify(lv)); } catch(e){} publish(); };
+    });
+  }
+  function codeBar(){
+    return '<div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div><button class="second" id="invite" type="button">Invite friends</button></div>';
+  }
+  function wireCommon(root){
+    var inv = root.querySelector('#invite');
+    if (inv) inv.onclick = function(){
+      var url = location.origin + location.pathname + '?room=' + code, b = this;
+      if (navigator.share) navigator.share({title:'400', text:'Join my 400 table. Code ' + code, url:url}).catch(function(){});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ b.textContent = 'Link copied'; }).catch(function(){ b.textContent = code; });
+    };
+    var n = root.querySelector('#nick');
+    if (n) {
+      n.onchange = function(){
+        nick = cleanName(this.value); try { localStorage.setItem(NKEY, nick); } catch(e){}
+        if (mode === 'client') pushClient(); else if (mode === 'host' && g) { if (mySeat >= 0) g.nm[mySeat] = nick || 'Host'; publish(); }
+      };
+      n.onblur = function(){ setTimeout(function(){ if (lobbyDirty && screen === 'lobby') drawLobby(); }, 0); };
+    }
+  }
+  function drawLobby(){
+    if (screen !== 'lobby') return;
+    var ae = document.activeElement;
+    if (ae && (ae.id === 'nick' || ae.tagName === 'SELECT') && $('lobby').contains(ae)) { lobbyDirty = true; return; }
+    lobbyDirty = false;
+    var h = '<h2>Waiting room</h2>', ready = g && (mode === 'host' ? net === 'open' : net === 'open' && g.phase === 'lobby');
+    if (net === 'opening') h += '<p>Connecting…</p>';
+    else if (net === 'notfound') h += '<p>No table with the code ' + esc(code) + ' is open right now. Check the code with the host.</p>';
+    else if (net === 'error') h += '<p>Could not connect. Check your internet connection and try again.</p>';
+    else if (net === 'lost') h += '<p>Lost the connection to the host. Trying to reconnect…</p>';
+    if (ready) {
+      h += codeBar();
+      h += '<label class="field" for="nick">Your name at the table<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>';
+      h += '<p>Pick a chair. Partners sit across from each other, and bots take any empty chair.</p>' + chairsHtml();
+      if (mode === 'host') {
+        var n = peersNow.length;
+        h += '<p>' + (n ? n + (n === 1 ? ' friend is' : ' friends are') + ' connected.' : 'No friends connected yet. Send them the invite.') + '</p>';
+        h += '<button class="primary" id="start" type="button">Start game</button>';
+      } else h += '<p>Waiting for ' + esc(hostName || 'the host') + ' to start the game.</p>';
+    }
+    h += '<button class="second" id="leaveL" type="button">Back to home</button>';
+    $('lobbyBox').innerHTML = h;
+    wireCommon($('lobbyBox')); wireChairs($('lobbyBox'));
+    $('leaveL').onclick = goHome;
+    if ($('start')) $('start').onclick = function(){ newGame(); show('table'); };
+  }
+  function hostLobby(){
+    closeNet(); mode = 'host'; myPeer = 'host'; mySeat = 0; gen++; sched = -1;
+    g = blank(['host','','',''], [nick || 'Host','','','']);
+    show('lobby'); openHost(0);
+  }
+  function joinLobby(c){
+    c = String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    if (c.length !== 4) { $('hNote').textContent = 'Enter the 4-character table code.'; return; }
+    closeNet(); mode = 'client'; myPeer = cid; mySeat = -1; want = -1; myAct = 0; sentTid = -1; g = null; gen++; code = c; retries = 0;
+    show('lobby'); openClient();
+  }
+  function goHome(){
+    closeNet(); mode = 'solo'; myPeer = 'host'; mySeat = 0; g = null; gen++; sheetKind = ''; $('sheet').hidden = true;
+    try { history.replaceState(null, '', location.pathname); } catch(e){}
+    show('home');
+  }
+
   /* ---------- sheets ---------- */
   function openSheet(kind, html){ sheetKind = kind; $('box').innerHTML = html; $('sheet').hidden = false; }
-  function closeSheet(){ sheetKind = ''; $('sheet').hidden = true; if (g && g.phase === 'end' && g.sum) showEnd(); }
+  function closeSheet(){ sheetKind = ''; $('sheet').hidden = true; if (g && g.phase === 'end' && g.sum && screen === 'table') showEnd(); }
   function showEnd(){
+    if (screen !== 'table') return;
     var s = g.sum, w = s.win, rows = '';
     s.rows.forEach(function(r){
       var mine = mySeat >= 0 ? (r[0] & 1) === (mySeat & 1) : !(r[0] & 1);
@@ -708,103 +861,122 @@ if (typeof module !== 'undefined') module.exports = E;
     openSheet('bots', h + '<button class="primary" id="go" type="button">Back to the table</button>');
     $('go').onclick = closeSheet;
     Array.prototype.forEach.call($('box').querySelectorAll('.seg button'), function(b){
-      b.onclick = function(){ lv[+b.dataset.p] = +b.dataset.l; try { localStorage.setItem(LKEY, JSON.stringify(lv)); } catch(e){} botsSheet(); };
+      b.onclick = function(){ lv[+b.dataset.p] = +b.dataset.l; try { localStorage.setItem(LKEY, JSON.stringify(lv)); } catch(e){} botsSheet(); publish(); };
     });
   }
-  function friendsSheet(){
-    var h = '<h2>Friends table</h2>';
-    h += '<label class="field" for="nick">Your name at the table<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>';
-    if (!room) {
-      h += window.claude ? '<p>Not connected. A friends table works when this page is shared with your friends from your Claude account and you each open it while signed in.</p>' : '<p>Playing with friends is not in the installed app yet. It needs its own online service, which is the next step.</p>';
-    } else if (mode === 'solo') {
-      var others = peersNow.filter(function(p){ return !p.sameTab && p.kind === 'viewer'; }).length;
-      h += '<p>' + (others ? others + (others === 1 ? ' other person has' : ' other people have') + ' this page open.' : 'Nobody else has this page open yet.') + '</p>';
-      if (openHost) h += '<button class="primary" id="join" type="button">Join ' + esc(cleanName(openHost.presence.t4h.host) || 'the') + '’s table</button>';
-      else h += '<button class="primary" id="host" type="button">Open a table</button>';
-    } else {
-      h += '<p>Pick a chair. Partners sit across from each other, and bots fill the empty chairs.</p><div class="chairs">';
-      [0,2,1,3].forEach(function(p){
-        var mine = p === mySeat, who = mine ? 'You' : isBot(p) ? BOT[p] + ', bot' : (g.nm[p] || 'Friend');
-        h += '<div class="chair' + (p & 1 ? ' b' : '') + '"><div><strong>' + esc(who) + '</strong><span>Team ' + (p & 1 ? '2' : '1') + '</span></div>' +
-          (mine ? '<button type="button" data-stand="1">Stand up</button>' : isBot(p) ? '<button type="button" data-sit="' + p + '">Sit here</button>' : '') + '</div>';
-      });
-      h += '</div>';
-      if (mode === 'host') h += '<button class="second" id="fresh" type="button">Restart the game at zero</button><button class="second" id="leave" type="button">Close the table</button>';
-      else h += '<button class="second" id="leave" type="button">Leave the table</button>';
-    }
+  function tableSheet(){
+    var h = '<h2>Your table</h2>' + codeBar() + '<p>A friend can take a bot’s chair at any time. If someone leaves, a bot plays their hand.</p>' + chairsHtml();
+    if (mode === 'host') h += '<button class="second" id="toLobby" type="button">Back to the waiting room</button>';
     h += '<button class="primary" id="go" type="button" style="margin-top:12px">Back to the table</button>';
-    openSheet('friends', h);
+    openSheet('seats', h);
+    wireCommon($('box')); wireChairs($('box'));
     $('go').onclick = closeSheet;
-    $('nick').onchange = function(){
-      nick = cleanName(this.value); try { localStorage.setItem(NKEY, nick); } catch(e){}
-      if (mode === 'client') pushClient(); else if (mode === 'host') publish();
+    if ($('toLobby')) $('toLobby').onclick = function(){
+      gen++; sched = -1; var keep = blank(g.seats, g.nm); g = keep; sheetKind = ''; $('sheet').hidden = true; show('lobby'); publish();
     };
-    if ($('host')) $('host').onclick = startHosting;
-    if ($('join')) $('join').onclick = joinTable;
-    if ($('leave')) $('leave').onclick = function(){ if (mode === 'host') stopHosting(); else leaveTable(); friendsSheet(); };
-    if ($('fresh')) $('fresh').onclick = function(){ closeSheet(); $('sheet').hidden = true; sheetKind = ''; newGame(); };
-    Array.prototype.forEach.call($('box').querySelectorAll('.chair button'), function(b){
-      b.onclick = function(){ sit(b.dataset.stand ? -1 : +b.dataset.sit); };
-    });
   }
-  function refreshFriends(){
-    var sig = mode + '|' + (g ? g.seats.join(',') + g.nm.join(',') : '') + '|' + (openHost ? openHost.peer : '') + '|' + peersNow.length + '|' + mySeat + '|' + !!room;
-    $('friendsBtn').classList.toggle('dot', mode !== 'solo' || !!openHost);
-    $('botsBtn').disabled = mode === 'client'; $('newBtn').disabled = mode === 'client';
-    if (sheetKind === 'friends' && sig !== friendsSig && document.activeElement !== $('nick')) { friendsSig = sig; friendsSheet(); }
-    friendsSig = sig;
+  function headerState(){
+    $('botsBtn').hidden = mode === 'client';
+    $('tableBtn').hidden = mode === 'solo';
   }
 
-  /* ---------- friends table: the host's device runs the game and shares it ---------- */
-  function publish(){
-    if (mode !== 'host' || !room) return;
-    room.presence({t4h:{host:nick || 'Host', tid:g.tid, ph:g.phase, sc:g.scores, dl:g.dealer,
+  /* ---------- friends table: the host's device runs the game and sends each friend their own cards ---------- */
+  function closeNet(){
+    netGen++;
+    try { if (conn) conn.close(); } catch(e){}
+    try { if (peer) peer.destroy(); } catch(e){}
+    peer = null; conn = null; conns = {}; peersNow = []; net = '';
+  }
+  function mkCode(){ var s = '', a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for (var i = 0; i < 4; i++) s += a[(Math.random() * a.length) | 0]; return s; }
+  function openHost(tries){
+    if (typeof Peer === 'undefined') { net = 'error'; drawLobby(); return; }
+    var my = netGen; code = mkCode(); net = 'opening'; drawLobby();
+    var p = peer = new Peer(PRE + code);
+    p.on('open', function(){ if (my !== netGen) return; net = 'open'; drawLobby(); });
+    p.on('connection', function(c){
+      if (my !== netGen) return;
+      c.on('open', function(){ if (my !== netGen) return; conns[c.peer] = {c:c, msg:null, at:Date.now()}; syncPeers(); });
+      c.on('data', function(d){ if (my !== netGen || !conns[c.peer]) return; if (d && typeof d === 'object') { conns[c.peer].msg = d; conns[c.peer].at = Date.now(); syncPeers(); } });
+      c.on('close', function(){ if (my !== netGen) return; delete conns[c.peer]; syncPeers(); });
+      c.on('error', function(){ if (my !== netGen) return; delete conns[c.peer]; syncPeers(); });
+    });
+    p.on('disconnected', function(){ if (my !== netGen) return; try { p.reconnect(); } catch(e){} });
+    p.on('error', function(e){
+      if (my !== netGen) return;
+      if (e && e.type === 'unavailable-id' && tries < 4) { try { p.destroy(); } catch(x){} openHost(tries + 1); return; }
+      if (net !== 'open') { net = 'error'; drawLobby(); }
+    });
+  }
+  function syncPeers(){
+    var byCid = {}, now = Date.now();
+    Object.keys(conns).forEach(function(id){
+      var k = conns[id], m = k.msg;
+      if (!m || typeof m.cid !== 'string' || !/^[a-z0-9]{10}$/.test(m.cid)) return;
+      if (!byCid[m.cid] || byCid[m.cid].at < k.at) byCid[m.cid] = k;
+    });
+    peersNow = Object.keys(byCid).map(function(c){ return {peer:c, sameTab:false, kind:'viewer', presence:{t4c:byCid[c].msg}}; });
+    hostSync(); publish(); drawLobby();
+    if (sheetKind === 'seats') tableSheet();
+  }
+  function stateFor(c){
+    var seat = g.seats.indexOf(c);
+    return {host:nick || 'Host', tid:g.tid, ph:g.phase, sc:g.scores, dl:g.dealer,
       b:g.bids.map(function(x){ return x == null ? -1 : x; }), w:g.won, tr:g.trick.map(function(t){ return [t.p, t.c]; }),
-      tn:g.turn, wc:g.winCard, col:g.collect, note:g.note || 0, h:g.hands, seats:g.seats, nm:g.nm, sum:g.sum || 0}}).catch(function(){});
+      tn:g.turn, wc:g.winCard, col:g.collect, note:g.note || 0, seats:g.seats, nm:g.nm, sum:g.sum || 0, lv:lv,
+      h:g.hands.map(function(h, i){ return i === seat ? h : h.length; })};
   }
-  function pushClient(){ if (room) room.presence({t4c:{nick:nick, want:want, act:myAct}}).catch(function(){}); }
-  function startHosting(){
-    if (!room || mode !== 'solo' || openHost) return;
-    mode = 'host'; g.seats = g.seats.map(function(x){ return x === '' ? '' : myPeer; }); g.nm[mySeat] = nick || 'Host';
-    render(); refreshFriends(); friendsSheet();
+  function publish(){
+    if (mode !== 'host' || !g) return;
+    Object.keys(conns).forEach(function(id){
+      var k = conns[id];
+      if (!k.msg || !k.c.open) return;
+      try { k.c.send(stateFor(k.msg.cid)); } catch(e){}
+    });
   }
-  function stopHosting(){
-    if (mode !== 'host') return;
-    mode = 'solo'; if (room) room.presence({t4h:null}).catch(function(){});
-    for (var s = 0; s < 4; s++) if (s !== mySeat) { g.seats[s] = ''; g.nm[s] = ''; }
-    if (mySeat < 0) { mySeat = 0; g.seats[0] = myPeer; }
-    sched = -1; render(); next(); refreshFriends();
+  function openClient(){
+    if (typeof Peer === 'undefined') { net = 'error'; drawLobby(); return; }
+    var my = ++netGen; net = retries ? 'lost' : 'opening'; drawLobby();
+    try { if (peer) peer.destroy(); } catch(e){}
+    var p = peer = new Peer();
+    p.on('open', function(){
+      if (my !== netGen) return;
+      var c = conn = p.connect(PRE + code, {reliable:true});
+      c.on('open', function(){ if (my !== netGen) return; net = 'open'; lastHeard = Date.now(); pushClient(); drawLobby(); });
+      c.on('data', function(d){ if (my !== netGen) return; lastHeard = Date.now(); retries = 0; if (net !== 'open') net = 'open'; adopt(d); });
+      c.on('close', function(){ if (my === netGen) lostHost(); });
+      c.on('error', function(){ if (my === netGen) lostHost(); });
+    });
+    p.on('error', function(e){
+      if (my !== netGen) return;
+      if (retries) { lostHost(); return; }
+      net = e && e.type === 'peer-unavailable' ? 'notfound' : 'error'; drawLobby();
+    });
+    setTimeout(function(){ if (my === netGen && net === 'opening') { net = 'error'; drawLobby(); } }, 15000);
   }
-  function joinTable(){
-    if (!room || !openHost) return;
-    gen++; mode = 'client'; hostPeer = openHost.peer; want = -1; myAct = 0; sentTid = -1; mySeat = -1;
-    pushClient(); adopt(openHost.presence.t4h); refreshFriends(); friendsSheet();
-  }
-  function leaveTable(){
+  function lostHost(){
     if (mode !== 'client') return;
-    mode = 'solo'; hostPeer = null; mySeat = 0; g = null; sheetKind = ''; $('sheet').hidden = true;
-    if (room) room.presence({t4c:null}).catch(function(){});
-    startSolo(); refreshFriends();
+    if (retries >= 20) { goHome(); $('hNote').textContent = 'The table closed or the connection was lost.'; return; }
+    retries++; net = 'lost'; netGen++;
+    if (screen === 'lobby') drawLobby(); else $('msg').textContent = 'Lost the connection. Reconnecting…';
+    var my = netGen;
+    setTimeout(function(){ if (my === netGen && mode === 'client') openClient(); }, 3000);
   }
+  function pushClient(){ if (mode === 'client' && conn && conn.open) { try { conn.send({cid:cid, nick:nick, want:want, act:myAct}); } catch(e){} } }
   function sit(s){
     if (mode === 'client') { want = s; pushClient(); return; }
     if (mode !== 'host') return;
     if (s >= 0 && !isBot(s)) return;
     if (mySeat >= 0) { g.seats[mySeat] = ''; g.nm[mySeat] = ''; }
     mySeat = s; if (s >= 0) { g.seats[s] = myPeer; g.nm[s] = nick || 'Host'; }
-    sched = -1; render(); next(); refreshFriends();
+    sched = -1; render(); next(); if (sheetKind === 'seats') tableSheet();
   }
   function hostSync(){
+    if (mode !== 'host' || !g) return;
     var here = {}, changed = false, s;
     peersNow.forEach(function(pe){ here[pe.peer] = 1; });
     for (s = 0; s < 4; s++) if (g.seats[s] && g.seats[s] !== myPeer && !here[g.seats[s]]) { g.seats[s] = ''; g.nm[s] = ''; changed = true; }
     peersNow.forEach(function(pe){
-      if (pe.sameTab || pe.kind !== 'viewer') return;
-      var c = pe.presence && pe.presence.t4c;
-      if (!c || typeof c !== 'object') {
-        var old = g.seats.indexOf(pe.peer); if (old >= 0) { g.seats[old] = ''; g.nm[old] = ''; changed = true; }
-        return;
-      }
+      var c = pe.presence.t4c;
       var cur = g.seats.indexOf(pe.peer), w = c.want;
       if (w === -1 && cur >= 0) { g.seats[cur] = ''; g.nm[cur] = ''; cur = -1; changed = true; }
       else if ((w === 0 || w === 1 || w === 2 || w === 3) && w !== cur && g.seats[w] === '') {
@@ -823,48 +995,43 @@ if (typeof module !== 'undefined') module.exports = E;
   }
   function adopt(s){
     try {
+      if (!s || typeof s !== 'object') return;
       var prevLen = g && g.trick ? g.trick.length : 0, prevPhase = g ? g.phase : '';
       var ng = {tid:s.tid|0, phase:String(s.ph), scores:s.sc.map(Number), dealer:s.dl|0,
         bids:s.b.map(function(x){ return x < 0 ? null : x|0; }), won:s.w.map(Number),
         trick:s.tr.map(function(t){ return {p:t[0]|0, c:t[1]|0}; }), turn:s.tn|0, winCard:s.wc|0, collect:s.col|0,
-        note:s.note && typeof s.note === 'object' ? s.note : null, hands:s.h.map(function(h){ return h.map(Number); }),
+        note:s.note && typeof s.note === 'object' ? s.note : null,
+        hands:s.h.map(function(h){ if (typeof h === 'number') { var a = []; for (var i = 0; i < h && i < 13; i++) a.push(-1); return a; } return h.map(Number); }),
         seats:s.seats.map(String), nm:s.nm.map(cleanName), sum:s.sum && s.sum.rows ? s.sum : null, fresh:-1};
       if (ng.scores.length !== 4 || ng.hands.length !== 4 || ng.seats.length !== 4) return;
       if (ng.trick.length > prevLen) ng.fresh = ng.trick[ng.trick.length - 1].c;
+      if (s.lv && s.lv.length === 4) lv = s.lv.map(function(x){ return Math.max(0, Math.min(3, x|0)); });
+      hostName = cleanName(s.host);
       g = ng; mySeat = g.seats.indexOf(myPeer);
+      var scr = g.phase === 'lobby' ? 'lobby' : 'table';
+      if (scr !== screen) { sheetKind = ''; $('sheet').hidden = true; show(scr); }
       render();
-      if (g.phase === 'end' && g.sum && prevPhase !== 'end' && sheetKind !== 'friends') showEnd();
+      if (sheetKind === 'seats') tableSheet();
+      if (g.phase === 'end' && g.sum && prevPhase !== 'end' && sheetKind !== 'seats') showEnd();
       else if (g.phase !== 'end' && sheetKind === 'end') { sheetKind = ''; $('sheet').hidden = true; }
     } catch(e){}
   }
-  function onRoom(){
-    var hosts = peersNow.filter(function(p){ return !p.sameTab && p.kind === 'viewer' && p.presence && p.presence.t4h && typeof p.presence.t4h === 'object'; });
-    hosts.sort(function(a, b){ return a.peer < b.peer ? -1 : 1; });
-    openHost = hosts[0] || null;
-    if (mode === 'host') { if (openHost && openHost.peer < myPeer) stopHosting(); else hostSync(); }
-    else if (mode === 'client') {
-      var h = null; hosts.forEach(function(p){ if (p.peer === hostPeer) h = p; });
-      if (!h) leaveTable(); else adopt(h.presence.t4h);
+  setInterval(function(){
+    var now = Date.now();
+    if (mode === 'host') {
+      var dropped = false;
+      Object.keys(conns).forEach(function(id){ if (now - conns[id].at > 20000) { try { conns[id].c.close(); } catch(e){} delete conns[id]; dropped = true; } });
+      if (dropped) syncPeers(); else publish();
+    } else if (mode === 'client') {
+      pushClient();
+      if (net === 'open' && now - lastHeard > 14000) lostHost();
     }
-    refreshFriends();
-  }
-  function connect(){
-    if (!window.claude || !window.claude.use) return;
-    window.claude.use('room').then(function(r){
-      if (!r) return;
-      room = r;
-      r.onPeers(function(ch){
-        peersNow = ch.peers;
-        ch.peers.forEach(function(p){
-          if (p.sameTab && p.peer !== myPeer) {
-            if (g && mode !== 'client') g.seats = g.seats.map(function(x){ return x === myPeer ? p.peer : x; });
-            myPeer = p.peer;
-          }
-        });
-        onRoom();
-      }, function(){ room = null; if (mode === 'host') stopHosting(); else if (mode === 'client') leaveTable(); refreshFriends(); });
-    }).catch(function(){});
-  }
+  }, 3000);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState !== 'visible') return;
+    if (mode === 'client' && (net === 'open' || net === 'lost') && (!conn || !conn.open)) { retries = Math.max(retries, 1); netGen++; openClient(); }
+    if (mode === 'host' && peer && peer.disconnected) { try { peer.reconnect(); } catch(e){} }
+  });
 
   /* ---------- drawing ---------- */
   function cardEl(c, tag){
@@ -884,14 +1051,12 @@ if (typeof module !== 'undefined') module.exports = E;
     for (var i = 0; i < k; i++) fan += '<i style="transform:rotate(' + ((i - (k - 1) / 2) * 13) + 'deg)"></i>';
     return '<div class="fan">' + fan + '</div>' + avatar(p) + '<div class="nm">' + esc(nm(p)) + '</div>' + tally(p);
   }
-  function scoreCell(p, where){
-    return '<div><span>' + esc(nm(p)) + (where ? ', ' + where : '') + '</span><b class="' + (g.scores[p] < 0 ? 'neg' : '') + '">' + fmt(g.scores[p]) + '</b></div>';
-  }
   function myTurnNow(){ return mySeat >= 0 && g.turn === mySeat && !(mode === 'client' && sentTid === g.tid); }
   function render(){
+    if (!g) return;
     var v = view(), k, p;
-    $('scores').innerHTML = '<div class="team">' + scoreCell(v, mySeat >= 0 ? '' : 'seat 1') + scoreCell((v + 2) & 3, 'partner') + '</div>' +
-      '<div class="team them">' + scoreCell((v + 3) & 3, 'left') + scoreCell((v + 1) & 3, 'right') + '</div>';
+    var sc = function(k, cls){ var q = (v + k) & 3; return '<b class="' + cls + (k & 1 ? ' o' : '') + '" title="' + esc(nm(q)) + '">' + fmt(g.scores[q]) + '</b>'; };
+    $('board').innerHTML = sc(2, 't') + sc(3, 'l') + '<i></i>' + sc(1, 'r') + sc(0, 'm');
     for (k = 1; k < 4; k++) {
       p = (v + k) & 3;
       var s = $('seat' + k);
@@ -924,9 +1089,9 @@ if (typeof module !== 'undefined') module.exports = E;
     else if (g.turn >= 0 && g.turn === mySeat) msg = g.phase === 'bid' ? '' : (g.trick.length ? 'Your turn' : 'Your lead');
     else if (g.turn >= 0) msg = nm(g.turn) + (g.phase === 'bid' ? ' is bidding' : isBot(g.turn) ? ' is thinking' : ' to play');
     $('msg').textContent = msg;
-    var pad = $('pad'), show = g.phase === 'bid' && myTurnNow();
-    pad.hidden = !show;
-    if (show) {
+    var pad = $('pad'), showPad = g.phase === 'bid' && myTurnNow();
+    pad.hidden = !showPad;
+    if (showPad) {
       var mb = E.minBid(g.scores[mySeat]), need = E.minTotal(g.scores), sofar = 0, cnt = 0;
       g.bids.forEach(function(b){ if (b != null) { sofar += b; cnt++; } });
       $('padHint').textContent = 'Table needs ' + need + ' in total' + (cnt ? ', ' + sofar + ' bid so far' : '');
@@ -937,16 +1102,41 @@ if (typeof module !== 'undefined') module.exports = E;
         grid.appendChild(bt);
       })(i);
     }
-    drawHand();
+    drawHand(); headerState();
+    if (screen === 'lobby') drawLobby();
     publish();
   }
   function act(k, v){
+    dragging = false;
     if (mode === 'client') { myAct = {tid:g.tid, k:k, v:v}; sentTid = g.tid; pushClient(); $('pad').hidden = true; drawHand(); }
     else if (k === 'b') placeBid(mySeat, v); else playCard(mySeat, v);
   }
+  var dragging = false, handDirty = false;
+  function dragify(el, c){
+    var sx = 0, sy = 0, pid = null, moved = false;
+    function done(){ pid = null; dragging = false; el.classList.remove('drag', 'go'); el.style.transform = ''; }
+    el.onpointerdown = function(e){ pid = e.pointerId; sx = e.clientX; sy = e.clientY; moved = false; dragging = true; try { el.setPointerCapture(pid); } catch(x){} el.classList.add('drag'); };
+    el.onpointermove = function(e){
+      if (pid !== e.pointerId) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) + Math.abs(dy) > 8) moved = true;
+      el.style.transform = 'translate(' + dx + 'px,' + (dy - 12) + 'px) scale(1.05)';
+      el.classList.toggle('go', dy < -70);
+    };
+    el.onpointerup = function(e){
+      if (pid !== e.pointerId) return;
+      var dy = e.clientY - sy, play = dy < -70 || !moved;
+      done();
+      if (play) act('p', c); else if (handDirty) drawHand();
+    };
+    el.onpointercancel = function(){ done(); if (handDirty) drawHand(); };
+  }
   function drawHand(){
+    if (dragging) { handDirty = true; return; }
+    handDirty = false;
     var box = $('hand'); box.innerHTML = '';
-    if (mySeat < 0) { box.innerHTML = '<div id="watch">You are watching. Open Friends to take a chair.</div>'; return; }
+    if (!g) return;
+    if (mySeat < 0) { box.innerHTML = '<div id="watch">You are watching. Tap Table to take a chair.</div>'; return; }
     var order = [1,0,2,3];
     var cards = g.hands[mySeat].slice().sort(function(a,b){ return order.indexOf(E.S(a)) - order.indexOf(E.S(b)) || a - b; });
     var myTurn = g.phase === 'play' && myTurnNow();
@@ -960,7 +1150,7 @@ if (typeof module !== 'undefined') module.exports = E;
       var el = cardEl(c, 'button'); el.type = 'button';
       el.style.left = (x0 + i * step) + 'px'; el.style.zIndex = i + 1;
       if (myTurn) {
-        if (legal.indexOf(c) >= 0) { el.classList.add('ok'); el.onclick = function(){ act('p', c); }; }
+        if (legal.indexOf(c) >= 0) { el.classList.add('ok'); dragify(el, c); }
         else { el.classList.add('no'); el.disabled = true; }
       } else el.disabled = true;
       box.appendChild(el);
@@ -969,21 +1159,22 @@ if (typeof module !== 'undefined') module.exports = E;
   window.addEventListener('resize', function(){ if (g) drawHand(); });
 
   var armed = 0;
-  $('newBtn').onclick = function(){
+  $('homeBtn').onclick = function(){
     var b = this;
-    if (armed) { armed = 0; b.textContent = 'New'; sheetKind = ''; $('sheet').hidden = true; newGame(); return; }
-    armed = 1; b.textContent = 'Sure?';
-    setTimeout(function(){ armed = 0; b.textContent = 'New'; }, 3000);
+    if (mode === 'solo' || armed) { armed = 0; b.textContent = 'Home'; goHome(); return; }
+    armed = 1; b.textContent = mode === 'host' ? 'Close table?' : 'Leave?';
+    setTimeout(function(){ armed = 0; b.textContent = 'Home'; }, 3000);
   };
   $('rulesBtn').onclick = rulesSheet;
   $('botsBtn').onclick = botsSheet;
-  $('friendsBtn').onclick = function(){ friendsSig = ''; friendsSheet(); };
+  $('tableBtn').onclick = tableSheet;
+  $('hBots').onclick = function(){ startSolo(false); };
+  $('hNew').onclick = function(){ startSolo(true); };
+  $('hFriends').onclick = hostLobby;
+  $('hJoin').onsubmit = function(e){ e.preventDefault(); $('hNote').textContent = ''; joinLobby($('hCode').value); };
 
-  function startSolo(){
-    var s = load();
-    if (s) { g = {scores:s.scores, dealer:s.dealer, seats:[myPeer,'','',''], nm:['','','',''], tid:0}; startRound(); } else newGame();
-  }
-  startSolo(); refreshFriends(); connect();
+  var m = /[?&]room=([A-Za-z0-9]{4})/.exec(location.search);
+  if (m) joinLobby(m[1]); else show('home');
 })();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
