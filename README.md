@@ -20,7 +20,7 @@ Play against bots or with friends through a table code.
 
 ## Building the iPhone app (needs a Mac with Xcode)
 
-1. Install Node.js and CocoaPods.
+1. Install Node.js. CocoaPods is not needed: the project uses Swift Package Manager.
 2. In this folder run `npm install`, then `npm run ios`.
 3. Run `npm run open` to open the project in Xcode.
 4. In Xcode, pick your Apple developer team under Signing, then run it on a phone or archive it for the App Store.
