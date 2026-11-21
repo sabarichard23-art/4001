@@ -390,6 +390,9 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .seg button{min-height:40px}
 @media (max-height:700px){#hand{height:116px}#hand .card{height:98px;width:70px;top:16px}#hand .card .pip{font-size:30px}.av{width:50px;height:50px}.seat.top{top:-28px}header{margin-bottom:60px}footer{margin-top:38px}#me{padding:8px 16px}#me .srow{padding:6px 14px}}
 .ltable{margin:72px 30px 0}.lseat.left{left:-36px}.lseat.right{right:-36px}.lmenu{width:200px}
+/* turn text is kept for screen readers only; the redeal notice stays visible */
+#msg:not(.show){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;left:0;right:auto;bottom:0}
+#msg.show{color:var(--text)}
 </style>
 </head>
 <body>
@@ -1634,6 +1637,7 @@ if (typeof module !== 'undefined') module.exports = E;
     }
     else if (g.turn >= 0) msg = nm(g.turn) + (g.phase === 'bid' ? ' is calling' : isBot(g.turn) ? ' is thinking' : ' to play');
     $('msg').textContent = msg;
+    $('msg').classList.toggle('show', !!(n && n.k === 'redeal'));
     $('table').classList.toggle('myturn', g.turn >= 0 && g.turn === mySeat && myTurnNow());
     $('table').classList.toggle('slot', g.phase === 'play' && g.turn === mySeat && myTurnNow());
     var pad = $('pad'), showPad = g.phase === 'bid' && myTurnNow();
@@ -1679,6 +1683,23 @@ if (typeof module !== 'undefined') module.exports = E;
     };
     el.onpointercancel = function(){ done(); if (handDirty) drawHand(); };
   }
+  /* Queue a card for your next turn: swipe it up. Swipe it back down to cancel. Taps do nothing. */
+  function qswipe(el, c){
+    var sy = 0, pid = null, base = c === queued ? -34 : 0;
+    function done(){ pid = null; dragging = false; el.classList.remove('drag'); el.style.transform = ''; }
+    el.onpointerdown = function(e){ pid = e.pointerId; sy = e.clientY; dragging = true; try { el.setPointerCapture(pid); } catch(x){} el.classList.add('drag'); };
+    el.onpointermove = function(e){
+      if (pid !== e.pointerId) return;
+      el.style.transform = 'translateY(' + Math.max(-70, Math.min(0, base + e.clientY - sy)) + 'px)';
+    };
+    el.onpointerup = function(e){
+      if (pid !== e.pointerId) return;
+      var dy = e.clientY - sy; done();
+      if (dy < -28) queued = c; else if (dy > 28 && c === queued) queued = -1;
+      drawHand();
+    };
+    el.onpointercancel = function(){ done(); drawHand(); };
+  }
   function drawHand(){
     if (dragging) { handDirty = true; return; }
     handDirty = false;
@@ -1713,8 +1734,8 @@ if (typeof module !== 'undefined') module.exports = E;
         else { el.classList.add('no'); el.disabled = true; }
       } else if (g.phase === 'play' && cards.length > 0 && !(mode === 'client' && sentTid === g.tid)) {
         if (c === queued) { el.classList.add('q'); el.setAttribute('aria-pressed', 'true'); }
-        el.setAttribute('aria-label', (c === queued ? 'Queued: ' : 'Queue ') + (el.getAttribute('aria-label') || 'card'));
-        el.onclick = function(){ queued = queued === c ? -1 : c; drawHand(); };
+        el.setAttribute('aria-label', (el.getAttribute('aria-label') || 'card') + (c === queued ? ', queued. Swipe down to cancel' : '. Swipe up to queue'));
+        qswipe(el, c);
       } else el.disabled = true;
       box.appendChild(el);
     });
