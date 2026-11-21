@@ -1375,9 +1375,9 @@ if (typeof module !== 'undefined') module.exports = E;
         (host ? '<button class="primary" id="start" type="button">Start game</button>' : '<p>Waiting for ' + esc(hostName || 'the host') + ' to start the game.</p>') +
         '<button class="primary alt" id="inviteF" type="button">Invite friends</button>' +
         '<button class="second" id="lset" type="button">Table settings</button>' +
-        '<p>' + (!host || net === 'open' ? 'Bots take any open seat when the game starts.' : net === 'opening' ? 'Connecting so friends can join.' : 'No connection, so friends cannot join right now. You can still play with bots.') + '</p></div></div>';
+        (host && net !== 'open' && net !== 'opening' ? '<p>No connection, so friends cannot join right now. You can still play with bots.</p>' : '') + '</div></div>';
       if (mySeat >= 0) h += '<div class="lme">' + avatar(mySeat) + '<div><strong>' + esc(nick || (host ? 'Host' : 'You')) + ' (you)</strong><span>' +
-        (host ? (n ? n + (n === 1 ? ' friend' : ' friends') + ' connected' : 'No friends connected yet') + ' · ' + open + (open === 1 ? ' seat open' : ' seats open') : 'Your partner sits across from you') +
+        (host ? (n ? n + (n === 1 ? ' friend' : ' friends') + ' connected' : '') : 'Your partner sits across from you') +
         '</span></div><button class="ghost" type="button" data-stand="1">Stand up</button></div>';
       else h += '<div class="lme"><div><strong>You are watching</strong><span>' + (isBot(v) ? 'The seat in front of you is open' : esc(g.nm[v] || 'A friend') + ' has this seat') + '</span></div>' +
         (isBot(v) ? '<button class="ghost" type="button" data-sit="' + v + '">Sit here</button>' : '') + '</div>';
