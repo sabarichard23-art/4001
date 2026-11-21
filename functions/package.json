@@ -1,0 +1,13 @@
+{
+  "name": "tarneeb-400-server",
+  "private": true,
+  "description": "Sends a notification when a friend invites you to a table or sends a friend request",
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.1",
+    "firebase-functions": "^7.4.0"
+  }
+}

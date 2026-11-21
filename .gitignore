@@ -4,3 +4,5 @@ ios/App/Pods/
 ios/App/App/public/
 ios/DerivedData/
 .DS_Store
+ios/App/CapApp-SPM/symlinks/
+functions/node_modules/
