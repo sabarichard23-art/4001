@@ -1289,7 +1289,7 @@ if (typeof module !== 'undefined') module.exports = E;
       if (legal.indexOf(qc) >= 0) {
         firing = qc;
         setTimeout(function(){ firing = -1; if (g && g.tid === qt && g.phase === 'play' && myTurnNow() && g.hands[mySeat].indexOf(qc) >= 0) act('p', qc); }, 350);
-      } else { $('msg').textContent = 'Your queued card cannot follow this trick. Pick another.'; }
+      }
     }
     if (firing >= 0 && !myTurn) firing = -1;
     var W = box.clientWidth, n = cards.length;
