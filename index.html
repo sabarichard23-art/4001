@@ -74,6 +74,8 @@ header{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
 .tally{margin-top:3px;background:rgba(6,12,10,.8);border-radius:8px;padding:2px 9px;font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .tally b{font-family:var(--display);font-size:18px;font-weight:700;color:var(--text);line-height:1}
 .made .tally{background:#0c3f2c}.made .tally b.w{color:var(--us)}
+.tally.got{background:#5ff0a8!important;color:#06301c;box-shadow:0 0 0 2px #06301c}.tally.got b,.tally.got b.w{color:#06301c!important}
+.tally.dead{background:#c9261d!important;color:#fff;box-shadow:0 0 0 2px #3d0a07}.tally.dead b,.tally.dead b.w{color:#fff!important}
 
 #trump{position:absolute;left:18px;bottom:16px;font-size:11px;color:rgba(240,235,225,.7);line-height:1.2;z-index:1}
 #trump b{display:block;font-size:22px;color:#ff8f86;line-height:1}
@@ -1183,7 +1185,9 @@ if (typeof module !== 'undefined') module.exports = E;
   function tally(p){
     var bid = g.bids[p];
     if (bid == null) return '<div class="tally">' + ((g.phase === 'bid' && g.turn === p) ? 'Bidding' : 'Waiting') + '</div>';
-    return '<div class="tally"><b class="w">' + g.won[p] + '</b> of <b>' + bid + '</b></div>';
+    var left = g.hands[p].length + (g.trick.some(function(t){ return t.p === p; }) ? 1 : 0);
+    var st = g.won[p] >= bid ? ' got' : (g.won[p] + left < bid ? ' dead' : '');
+    return '<div class="tally' + st + '"' + (st ? ' aria-label="' + g.won[p] + ' of ' + bid + (st === ' got' ? ', bid made' : ', bid cannot be made') + '"' : '') + '><b class="w">' + g.won[p] + '</b> of <b>' + bid + '</b></div>';
   }
   function seatHtml(p){
     var n = g.hands[p].length, k = Math.min(7, Math.ceil(n / 2)), fan = '';
