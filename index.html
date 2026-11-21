@@ -1253,6 +1253,28 @@ if (typeof module !== 'undefined') module.exports = E;
     if (s.bots && s.bots.length === 4) BOT = s.bots.map(cleanName); else pickBots();
     g = blank([myPeer,'','',''], ['','','','']); g.scores = s.scores; g.dealer = s.dealer; gen++; sched = -1; startRound();
   }
+  /* Bot skill as two choices: your partner, and both opponents together. No names until the game starts. */
+  function lv2(v, bot){
+    var h = '', P = (v + 2) & 3, O = [(v + 1) & 3, (v + 3) & 3].filter(bot);
+    var row = function(key, title, cur){
+      var r = '<div class="lvrow"><h3>' + title + '</h3><div class="seg">';
+      LEVELS.forEach(function(n, l){ r += '<button type="button" data-g="' + key + '" data-l="' + l + '" aria-pressed="' + (cur === l) + '">' + n + '</button>'; });
+      return r + '</div></div>';
+    };
+    if (bot(P)) h += row('p', 'Your partner', lv[P]);
+    if (O.length) h += row('o', 'Opponents', lv[O[0]]);
+    return h;
+  }
+  function wireLv2(root, v, again){
+    Array.prototype.forEach.call(root.querySelectorAll('.seg button[data-g]'), function(b){
+      b.onclick = function(){
+        var l = +b.dataset.l;
+        if (b.dataset.g === 'p') lv[(v + 2) & 3] = l; else { lv[(v + 1) & 3] = l; lv[(v + 3) & 3] = l; }
+        try { localStorage.setItem(LKEY, JSON.stringify(lv)); } catch(e){}
+        again();
+      };
+    });
+  }
   function lvRows(seats, where){
     var h = '';
     seats.forEach(function(p, i){
@@ -1347,16 +1369,12 @@ if (typeof module !== 'undefined') module.exports = E;
         '</span></div><button class="ghost" type="button" data-stand="1">Stand up</button></div>';
       else h += '<div class="lme"><div><strong>You are watching</strong><span>' + (isBot(v) ? 'The seat in front of you is open' : esc(g.nm[v] || 'A friend') + ' has this seat') + '</span></div>' +
         (isBot(v) ? '<button class="ghost" type="button" data-sit="' + v + '">Sit here</button>' : '') + '</div>';
-      if (host) {
-        var bs = [(v + 2) & 3, (v + 1) & 3, (v + 3) & 3].filter(isBot);
-        if (mySeat < 0 && isBot(v)) bs.push(v);
-        if (bs.length) h += '<div class="lcard">' + lvRows(bs, bs.map(function(p){ return ['your seat','on your right','across from you','on your left'][(p - v) & 3]; })) + '</div>';
-      }
+      if (host) { var l2 = lv2(v, isBot); if (l2) h += '<div class="lcard">' + l2 + '</div>'; }
     }
     $('lobbyBox').innerHTML = h;
     wireCommon($('lobbyBox'));
     Array.prototype.forEach.call($('lobbyBox').querySelectorAll('[data-sit],[data-stand]'), function(b){ b.onclick = function(){ sit(b.dataset.stand ? -1 : +b.dataset.sit); }; });
-    wireLv($('lobbyBox'), function(){ drawLobby(); publish(); });
+    wireLv2($('lobbyBox'), view(), function(){ drawLobby(); publish(); });
     $('leaveL').onclick = goHome;
     if ($('start')) $('start').onclick = function(){ newGame(); show('table'); };
     if ($('lset')) $('lset').onclick = lobbySettings;
@@ -1873,8 +1891,8 @@ if (typeof module !== 'undefined') module.exports = E;
     $('hJoin').onsubmit = function(e){ e.preventDefault(); var c = $('hCode').value; sheetKind = ''; $('sheet').hidden = true; $('hNote').textContent = ''; joinLobby(c); };
   }
   $('hSkill').onclick = function skill(){
-    openSheet('skill', '<h2>Bot skill</h2><p>How strong each bot is in your next game. You can change it again before every game.</p>' + lvRows([2,1,3], ['your partner','on your right','on your left']) + '<button class="primary" id="go" type="button">Done</button>');
-    wireLv($('box'), skill); $('go').onclick = closeSheet;
+    openSheet('skill', '<h2>Bot skill</h2><p>How strong the bots are in your next game. You can change it again before every game.</p>' + lv2(0, function(){ return true; }) + '<button class="primary" id="go" type="button">Done</button>');
+    wireLv2($('box'), 0, skill); $('go').onclick = closeSheet;
   };
   $('hRecord').onclick = function(){
     openSheet('rec', '<h2>My record</h2>' + (recLines.length ? '<ul><li>' + recLines.map(esc).join('</li><li>') + '</li></ul>' : '<p>Finish a game against bots and your record shows here.</p>') + '<button class="primary" id="go" type="button">Done</button>');
