@@ -476,6 +476,10 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .lseat{width:106px}.lseat.top{margin-left:-53px}.lseat.left{left:-45px}.lseat.right{right:-45px}.lmenu{width:172px;padding:12px}.skillbtn{padding:5px 5px 6px}.skillbtn span{font-size:10.5px}
 .skills{display:flex;flex-direction:column;gap:8px}.skills .second,.skills .primary{margin:0;min-height:52px;font-size:16px;font-weight:600}
 #home .htiles{grid-template-columns:1fr 1fr}
+.srs{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.srs div{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}.srs strong{font-size:15px}.srs span{font-size:13px;color:var(--muted)}
+.srs b{font-family:var(--display);font-size:26px;font-weight:700;color:var(--text);white-space:nowrap}.srs b.up{color:var(--us)}.srs b.down{color:var(--them)}
+.pick .emo-pick{min-height:96px;justify-content:center;padding:8px 4px}
 </style>
 </head>
 <body>
@@ -976,7 +980,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return '&#' + c.charCodeAt(0) + ';'; }); }
   function cleanName(t){ return String(t == null ? '' : t).replace(/[^\w À-ɏ؀-ۿ.'-]/g, '').trim().slice(0, 12); }
-  function later(fn, ms){ var t = gen; setTimeout(function(){ if (t === gen) fn(); }, ms); }
+  function later(fn, ms){ var t = gen; setTimeout(function(){ if (t === gen) fn(); }, window.TEST_SPEED ? ms * window.TEST_SPEED : ms); }
   function save(){ if (mode !== 'solo' || !g) return; try { localStorage.setItem(KEY, JSON.stringify({scores:g.scores, dealer:g.dealer, bots:BOT})); } catch(e){} }
   function load(){ try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.scores && s.scores.length === 4 && E.gameWinner(s.scores) < 0) return s; } catch(e){} return null; }
   function isBot(p){ return g.seats[p] === ''; }
@@ -1016,7 +1020,21 @@ if (typeof module !== 'undefined') module.exports = E;
     gen++; sched = -1;
     var seats = g ? g.seats : [myPeer,'','',''], names = g ? g.nm : ['','','',''];
     g = blank(seats, names);
+    /* who started this game, by account: '' is a bot, 'guest' is a person without a profile */
+    lineup = seats.map(function(s){ return !s ? '' : s === myPeer ? (myUid() || 'guest') : (peerUid[s] || 'guest'); });
+    reported = false;
     save(); startRound();
+  }
+  var peerUid = {}, lineup = null, reported = false;
+  function myUid(){ return fbUp && me && fb() ? fb().uid() : ''; }
+  function reportSeries(win){
+    if (reported || !lineup || mode === 'client' || !myUid()) return;
+    var t = [[lineup[0], lineup[2]], [lineup[1], lineup[3]]];
+    if (lineup.indexOf('guest') >= 0) return;
+    var kind = t.map(function(x){ return x[0] && x[1] ? 2 : (!x[0] && !x[1] ? 0 : 1); });
+    if (kind[0] === 1 || kind[1] === 1 || kind[0] + kind[1] < 2) return;
+    reported = true;
+    fb().reportSeries(t[0].filter(Boolean), t[1].filter(Boolean), win).catch(function(){});
   }
   function startRound(){
     g.hands = E.deal(); g.first = (g.dealer + 1) & 3;
@@ -1085,7 +1103,7 @@ if (typeof module !== 'undefined') module.exports = E;
       try { localStorage.removeItem(KEY); var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'), lk = 'L' + Math.min(lv[(mySeat + 1) & 3], lv[(mySeat + 3) & 3]); rec[lk] = rec[lk] || [0, 0]; rec[lk][g.sum.win === (mySeat & 1) ? 0 : 1]++; localStorage.setItem(RKEY, JSON.stringify(rec)); } catch(e){}
     }
     render(); showEnd();
-    if (g.sum.win < 0) later(startRound, 2600);
+    if (g.sum.win < 0) later(startRound, 2600); else reportSeries(g.sum.win);
   }
 
   /* ---------- home and waiting room ---------- */
@@ -1102,7 +1120,7 @@ if (typeof module !== 'undefined') module.exports = E;
   }
   var recLines = [];
   /* ---------- accounts, friends and invites (Firebase) ---------- */
-  var me = null, fbUp = false, friends = [], invites = [], profs = {}, invited = {}, fbMsg = '';
+  var me = null, fbUp = false, friends = [], invites = [], profs = {}, invited = {}, fbMsg = '', series = [];
   function fb(){ return window.FB || null; }
   function typing(){ var ae = document.activeElement; return ae && ae.tagName === 'INPUT' && $('box').contains(ae); }
   function refreshSheets(){
@@ -1123,6 +1141,12 @@ if (typeof module !== 'undefined') module.exports = E;
         friends = list;
         list.forEach(function(f){ if (!profs[f.uid]) F.getProfile(f.uid).then(function(p){ profs[f.uid] = p || {name:'Player', handle:'', avatar:0}; drawFriendsHome(); refreshSheets(); }).catch(function(){}); });
         drawFriendsHome(); refreshSheets();
+      });
+      if (F.watchSeries) F.watchSeries(function(list){
+        if (!list) return;
+        series = list;
+        list.forEach(function(s){ s.t0.concat(s.t1).forEach(function(id){ if (id !== uid && !profs[id]) { profs[id] = {name:'Player', handle:'', avatar:0}; F.getProfile(id).then(function(p){ if (p) profs[id] = p; if (sheetKind === 'rec' && !$('sheet').hidden) recordSheet(); }).catch(function(){}); } }); });
+        if (sheetKind === 'rec' && !$('sheet').hidden) recordSheet();
       });
       F.watchInvites(function(list){
         if (!list) return;
@@ -1523,7 +1547,7 @@ if (typeof module !== 'undefined') module.exports = E;
       h += '<form id="chatForm" class="joinrow"><input id="chatIn" maxlength="60" placeholder="Type a message" autocomplete="off" aria-label="Message" style="text-transform:none;letter-spacing:0"><button class="second" type="submit">Send</button></form>';
     } else {
       h += '<div class="pick' + (chatTab === 'm' ? ' words' : '') + '">';
-      if (chatTab === 'e') EMOTES.forEach(function(t, i){ h += '<button type="button" class="emo-pick" data-say="' + i + '">' + emoSvg(i, 60) + '<span>' + esc(t[1]) + '</span></button>'; });
+      if (chatTab === 'e') EMOTES.forEach(function(t, i){ h += '<button type="button" class="emo-pick" data-say="' + i + '" aria-label="' + esc(t[1]) + '">' + emoSvg(i, 68) + '</button>'; });
       else WORDS.forEach(function(t, i){ h += '<button type="button" data-say="' + i + '">' + esc(t) + '</button>'; });
       h += '</div>';
     }
@@ -1606,7 +1630,7 @@ if (typeof module !== 'undefined') module.exports = E;
       adopt(d);
     });
   }
-  function pushClient(){ if (mode === 'client') send(PRE + code + '/c', {cid:cid, sid:sid, n:++cn, nick:nick, want:want, act:myAct, say:mySay}); }
+  function pushClient(){ if (mode === 'client') send(PRE + code + '/c', {cid:cid, sid:sid, n:++cn, nick:nick, want:want, act:myAct, say:mySay, uid:myUid()}); }
   function sit(s){
     if (mode === 'client') { want = s; pushClient(); return; }
     if (mode !== 'host') return;
@@ -1622,6 +1646,7 @@ if (typeof module !== 'undefined') module.exports = E;
     for (s = 0; s < 4; s++) if (g.seats[s] && g.seats[s] !== myPeer && !here[g.seats[s]]) { g.seats[s] = ''; g.nm[s] = ''; changed = true; }
     peersNow.forEach(function(pe){
       var c = pe.presence.t4c;
+      peerUid[pe.peer] = typeof c.uid === 'string' && /^[A-Za-z0-9]{6,40}$/.test(c.uid) ? c.uid : '';
       var cur = g.seats.indexOf(pe.peer), w = c.want;
       if (w === -1 && cur >= 0) { g.seats[cur] = ''; g.nm[cur] = ''; cur = -1; changed = true; }
       else if ((w === 0 || w === 1 || w === 2 || w === 3) && w !== cur && g.seats[w] === '') {
@@ -1912,10 +1937,21 @@ if (typeof module !== 'undefined') module.exports = E;
     $('go').onclick = closeSheet;
     $('hJoin').onsubmit = function(e){ e.preventDefault(); var c = $('hCode').value; sheetKind = ''; $('sheet').hidden = true; $('hNote').textContent = ''; joinLobby(c); };
   }
-  $('hRecord').onclick = function(){
-    openSheet('rec', '<h2>My record</h2>' + (recLines.length ? '<ul><li>' + recLines.map(esc).join('</li><li>') + '</li></ul>' : '<p>Finish a game against bots and your record shows here.</p>') + '<button class="primary" id="go" type="button">Done</button>');
+  function recordSheet(){
+    var uid = myUid(), h = '<h2>My record</h2>';
+    var who = function(ids){ return ids.length ? ids.map(function(id){ return id === uid ? 'You' : esc(cleanName((profs[id] || {}).name) || 'Player'); }).join(' + ') : 'bots'; };
+    var rows = series.slice().sort(function(a, b){ return b.at - a.at; });
+    h += '<h3 class="fh">Series</h3>';
+    if (!rows.length) h += '<p>' + (uid ? 'Finish a game with friends who have a profile and the series shows here. Each exact line-up keeps its own score.' : 'Set up your profile to keep a series score with your friends.') + '</p>';
+    rows.forEach(function(s){
+      var mine = s.t0.indexOf(uid) >= 0 ? 0 : 1, a = mine ? s.t1 : s.t0, b = mine ? s.t0 : s.t1, wa = mine ? s.w1 : s.w0, wb = mine ? s.w0 : s.w1;
+      h += '<div class="srs"><div><strong>' + who(a) + '</strong><span>vs ' + who(b) + '</span></div><b class="' + (wa > wb ? 'up' : wa < wb ? 'down' : '') + '" aria-label="' + wa + ' wins, ' + wb + ' losses">' + wa + '\u2013' + wb + '</b></div>';
+    });
+    h += '<h3 class="fh">On your own against bots</h3>' + (recLines.length ? '<ul><li>' + recLines.map(esc).join('</li><li>') + '</li></ul>' : '<p>Finish a game against bots and your record shows here.</p>');
+    openSheet('rec', h + '<button class="primary" id="go" type="button">Done</button>');
     $('go').onclick = closeSheet;
-  };
+  }
+  $('hRecord').onclick = recordSheet;
   if (document.readyState === 'complete') startFB(); else window.addEventListener('load', startFB);
   $('botsBtn').onclick = botsSheet;
   $('tableBtn').onclick = function(){
