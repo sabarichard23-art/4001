@@ -475,6 +475,7 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .skillbtn b{font-size:12px;font-weight:600}.skillbtn span{font-size:11px;font-weight:600;color:var(--accent)}
 .lseat{width:106px}.lseat.top{margin-left:-53px}.lseat.left{left:-45px}.lseat.right{right:-45px}.lmenu{width:172px;padding:12px}.skillbtn{padding:5px 5px 6px}.skillbtn span{font-size:10.5px}
 .skills{display:flex;flex-direction:column;gap:8px}.skills .second,.skills .primary{margin:0;min-height:52px;font-size:16px;font-weight:600}
+#home .htiles{grid-template-columns:1fr 1fr}
 </style>
 </head>
 <body>
@@ -527,7 +528,7 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
       </div>
       <p id="hNote" aria-live="polite"></p>
       <div class="hfr"><div class="hfrh"><strong>Friends</strong><span id="hFrN"></span></div><div id="hFrs"></div></div>
-      <div class="htiles"><button class="tile" id="hRules" type="button">Rules</button><button class="tile" id="hSkill" type="button">Bot skill</button><button class="tile" id="hRecord" type="button">My record</button></div>
+      <div class="htiles"><button class="tile" id="hRules" type="button">Rules</button><button class="tile" id="hRecord" type="button">My record</button></div>
       <p class="fine"><a href="privacy.html">Privacy</a></p>
     </div>
     <div class="htabs"><button type="button" class="on" aria-current="page">Home</button><button type="button" id="hFr">Friends</button><button type="button" id="hTabP">Profile</button></div>
@@ -1911,10 +1912,6 @@ if (typeof module !== 'undefined') module.exports = E;
     $('go').onclick = closeSheet;
     $('hJoin').onsubmit = function(e){ e.preventDefault(); var c = $('hCode').value; sheetKind = ''; $('sheet').hidden = true; $('hNote').textContent = ''; joinLobby(c); };
   }
-  $('hSkill').onclick = function skill(){
-    openSheet('skill', '<h2>Bot skill</h2><p>How strong the bots are in your next game. You can change it again before every game.</p>' + lv2(0, function(){ return true; }) + '<button class="primary" id="go" type="button">Done</button>');
-    wireLv2($('box'), 0, skill); $('go').onclick = closeSheet;
-  };
   $('hRecord').onclick = function(){
     openSheet('rec', '<h2>My record</h2>' + (recLines.length ? '<ul><li>' + recLines.map(esc).join('</li><li>') + '</li></ul>' : '<p>Finish a game against bots and your record shows here.</p>') + '<button class="primary" id="go" type="button">Done</button>');
     $('go').onclick = closeSheet;
