@@ -977,7 +977,12 @@ if (typeof module !== 'undefined') module.exports = E;
   if (!/^[a-z0-9]{10}$/.test(cid)) { cid = ''; for (var ci = 0; ci < 10; ci++) cid += 'abcdefghijklmnopqrstuvwxyz0123456789'[(Math.random() * 36) | 0]; try { localStorage.setItem(CKEY, cid); } catch(e){} }
 
   var CAP = window.Capacitor, NATIVE = !!(CAP && CAP.isNativePlatform && CAP.isNativePlatform());
-  function buzz(){ try { if (NATIVE && CAP.Plugins && CAP.Plugins.Haptics) CAP.Plugins.Haptics.impact({style:'LIGHT'}); } catch(e){} }
+  /* The iPhone app's bridge: call a native plugin directly. (Capacitor.Plugins is only filled in when the Capacitor JS library is loaded, and this page does not load it.) */
+  function nat(plugin, method, opts){
+    if (!NATIVE || !CAP.nativePromise) return Promise.reject(new Error('not native'));
+    try { return CAP.nativePromise(plugin, method, opts || {}); } catch(e){ return Promise.reject(e); }
+  }
+  function buzz(){ nat('Haptics', 'impact', {style:'LIGHT'}).catch(function(){}); }
   var buzzedTid = -1;
   function $(id){ return document.getElementById(id); }
   function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return '&#' + c.charCodeAt(0) + ';'; }); }
@@ -1161,13 +1166,13 @@ if (typeof module !== 'undefined') module.exports = E;
   /* iPhone app only: ask to send notifications, then keep this phone's address on the account so invites can reach it */
   var pushWired = false;
   function pushSetup(ask){
-    var M = NATIVE && CAP.Plugins && CAP.Plugins.FirebaseMessaging;
-    if (!M || !myUid() || !fb().savePushToken) return;
-    var keep = function(){ M.getToken().then(function(r){ if (r && r.token) fb().savePushToken(r.token).catch(function(){}); }).catch(function(){}); };
-    if (!pushWired) { pushWired = true; try { M.addListener('tokenReceived', function(e){ if (e && e.token && myUid()) fb().savePushToken(e.token).catch(function(){}); }); } catch(e){} }
-    M.checkPermissions().then(function(p){
-      if (p.receive === 'granted') keep();
-      else if (ask && p.receive !== 'denied') M.requestPermissions().then(function(q){ if (q.receive === 'granted') keep(); }).catch(function(){});
+    if (!NATIVE || !CAP.nativePromise || !myUid() || !fb().savePushToken) return;
+    var M = 'FirebaseMessaging';
+    var keep = function(){ nat(M, 'getToken').then(function(r){ if (r && r.token) fb().savePushToken(r.token).catch(function(){}); }).catch(function(){}); };
+    if (!pushWired && CAP.addListener) { pushWired = true; try { CAP.addListener(M, 'tokenReceived', function(e){ if (e && e.token && myUid()) fb().savePushToken(e.token).catch(function(){}); }); } catch(e){} }
+    nat(M, 'checkPermissions').then(function(p){
+      if (p && p.receive === 'granted') keep();
+      else if (ask && (!p || p.receive !== 'denied')) nat(M, 'requestPermissions').then(function(q){ if (q && q.receive === 'granted') keep(); }).catch(function(){});
     }).catch(function(){});
   }
   function drawFriendsHome(){
