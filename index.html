@@ -275,6 +275,12 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
 .htabs button.dot{color:var(--brass)}
 .inv .av{width:40px;height:40px;flex:none;border-width:2px}.inv .primary{background:#63d0ac;box-shadow:none}
 #home .fine{margin:0}
+
+.htiles.one{grid-template-columns:1fr}
+.codebar.quiet{background:none;padding:10px 0 0;margin:6px 0 4px;border-top:1px solid var(--line);border-radius:0}
+.codebar.quiet span{font-size:13px;line-height:1.4}.codebar.quiet b{font-family:inherit;font-size:13px;letter-spacing:1px;line-height:inherit;display:inline;color:var(--text)}
+.linkbtn{background:none;border:0;padding:8px;color:var(--muted);font-size:13px;text-decoration:underline}
+#hand{isolation:isolate}
 </style>
 </head>
 <body>
@@ -320,7 +326,7 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
         <p>Hearts are trump. First to 41.</p>
         <button class="primary" id="hFriends" type="button">Open a table</button>
       </div>
-      <div class="htiles two"><button class="tile" id="hBots" type="button">Quick game vs bots</button><button class="tile" id="hJoinBtn" type="button">Join with a code</button></div>
+      <div class="htiles one"><button class="tile" id="hBots" type="button">Quick game vs bots</button></div>
       <button class="second" id="hNew" type="button" hidden>Start a new game vs bots</button>
       <p id="hNote" aria-live="polite"></p>
       <div class="hfr"><div class="hfrh"><strong>Friends</strong><span id="hFrN"></span></div><div id="hFrs"></div></div>
@@ -939,7 +945,7 @@ if (typeof module !== 'undefined') module.exports = E;
     var h = '';
     invites.forEach(function(v){
       var ip = profs[v.from];
-      h += '<div class="inv">' + (ip ? avatar(0, ip.avatar | 0) : '') + '<div><strong>' + esc(cleanName(v.fromName) || 'A friend') + ' invited you</strong><span>Table ' + esc(v.code) + ' · waiting to start</span></div>' +
+      h += '<div class="inv">' + (ip ? avatar(0, ip.avatar | 0) : '') + '<div><strong>' + esc(cleanName(v.fromName) || 'A friend') + ' invited you</strong><span>Waiting to start</span></div>' +
         '<button class="primary" type="button" data-join="' + esc(v.id) + '">Join</button><button class="ghost" type="button" data-skip="' + esc(v.id) + '" aria-label="Dismiss invite">Not now</button></div>';
     });
     $('hInv').innerHTML = h;
@@ -996,8 +1002,8 @@ if (typeof module !== 'undefined') module.exports = E;
     return '<div class="frow">' + avatar(0, p.avatar | 0) + '<div><strong>' + esc(cleanName(p.name) || 'Player') + '</strong><span>' + (p.handle ? '@' + esc(p.handle) : '') + '</span></div>' + btns + '</div>';
   }
   function friendsSheet(msg){
-    if (!(fbUp && fb())) { openSheet('friends', '<h2>Friends</h2><p>Friends are not available right now. Check your connection and reopen the game.</p><button class="primary" id="go" type="button">Close</button>'); $('go').onclick = closeSheet; return; }
-    if (!me) { openSheet('friends', '<h2>Friends</h2><p>Pick a name and a username first, so friends can find you.</p><button class="primary" id="go" type="button">Set up my profile</button><button class="second" id="fx" type="button">Close</button>'); $('go').onclick = function(){ profileSheet(); }; $('fx').onclick = closeSheet; return; }
+    if (!(fbUp && fb())) { openSheet('friends', '<h2>Friends</h2><p>Friends are not available right now. Check your connection and reopen the game.</p><button class="primary" id="go" type="button">Close</button>' + JOINLINK); $('go').onclick = closeSheet; wireJoin(); return; }
+    if (!me) { openSheet('friends', '<h2>Friends</h2><p>Pick a name and a username first, so friends can find you.</p><button class="primary" id="go" type="button">Set up my profile</button><button class="second" id="fx" type="button">Close</button>' + JOINLINK); $('go').onclick = function(){ profileSheet(); }; $('fx').onclick = closeSheet; wireJoin(); return; }
     var inc = friends.filter(function(f){ return f.status === 'pending' && !f.mine; }), out = friends.filter(function(f){ return f.status === 'pending' && f.mine; }), acc = friends.filter(function(f){ return f.status === 'accepted'; });
     var h = '<h2>Friends</h2><p>Your username is <b>@' + esc(me.handle) + '</b>. Friends add you with it.</p>' +
       '<form id="fadd" class="joinrow" style="margin:0 0 6px"><input id="fname" maxlength="16" placeholder="Friend’s username" autocapitalize="none" autocomplete="off" spellcheck="false" aria-label="Friend’s username" style="text-transform:none;letter-spacing:0"><button class="second" type="submit">Add</button></form>' +
@@ -1008,7 +1014,8 @@ if (typeof module !== 'undefined') module.exports = E;
     if (!acc.length) h += '<p>No friends yet. Add one by username.</p>';
     acc.forEach(function(f){ h += frow(f, '<button class="ghost" type="button" data-rm="' + f.uid + '">Remove</button>'); });
     if (out.length) { h += '<h3 class="fh">Sent</h3>'; out.forEach(function(f){ h += frow(f, '<button class="ghost" type="button" data-rm="' + f.uid + '">Cancel</button>'); }); }
-    openSheet('friends', h + '<button class="primary" id="go" type="button" style="margin-top:12px">Done</button>');
+    openSheet('friends', h + '<button class="primary" id="go" type="button" style="margin-top:12px">Done</button>' + (screen === 'home' ? JOINLINK : ''));
+    wireJoin();
     $('go').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; if (screen === 'lobby') inviteSheet(); };
     Array.prototype.forEach.call($('box').querySelectorAll('[data-acc],[data-rm]'), function(b){
       b.onclick = function(){ b.disabled = true; (b.dataset.acc ? fb().acceptFriend(b.dataset.acc) : fb().removeFriend(b.dataset.rm)).catch(function(){ friendsSheet('That did not go through. Try again.'); }); };
@@ -1031,13 +1038,13 @@ if (typeof module !== 'undefined') module.exports = E;
   }
   function inviteSheet(){
     var on = fbUp && fb() && me, acc = friends.filter(function(f){ return f.status === 'accepted'; });
-    var h = '<h2>Invite friends</h2><div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div><button class="second" id="invite" type="button">Share a link</button></div>';
+    var h = '<h2>Invite friends</h2>', tail = codeBar();
     if (on) {
       if (!acc.length) h += '<p>You have no friends added yet.</p>';
       acc.forEach(function(f){ h += frow(f, invited[code + f.uid] ? '<button class="ghost" type="button" disabled>Invited</button>' : '<button class="primary" type="button" data-inv="' + f.uid + '">Invite</button>'); });
       h += '<p style="margin-top:10px">Invited friends see it on their home screen when they open the game.</p>';
-    } else h += '<p>' + (fbUp && fb() ? 'Set up your profile to invite friends by username.' : 'Share the link or the code with your friends.') + '</p>';
-    h += '<button class="second" id="fmore" type="button">' + (on ? 'Add a friend' : 'Set up my profile') + '</button><button class="primary" id="go" type="button" style="margin-top:12px">Done</button>';
+    } else h += '<p>' + (fbUp && fb() ? 'Set up your profile to invite friends by username.' : 'Share the link with your friends.') + '</p>';
+    h += tail + '<button class="second" id="fmore" type="button">' + (on ? 'Add a friend' : 'Set up my profile') + '</button><button class="primary" id="go" type="button" style="margin-top:12px">Done</button>';
     openSheet('invitef', h);
     wireCommon($('box'));
     $('go').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; };
@@ -1106,7 +1113,7 @@ if (typeof module !== 'undefined') module.exports = E;
     });
   }
   function codeBar(){
-    return '<div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div><button class="second" id="invite" type="button">Invite friends</button></div>';
+    return '<div class="codebar quiet"><div><span>Not friends yet? Send a link, or give them the code <b>' + esc(code) + '</b></span></div><button class="second" id="invite" type="button">Share a link</button></div>';
   }
   function wireCommon(root){
     var inv = root.querySelector('#invite');
@@ -1133,7 +1140,7 @@ if (typeof module !== 'undefined') module.exports = E;
     if (screen !== 'lobby') return;
     lobbyDirty = false;
     var ready = g && (mode === 'host' ? net === 'open' : net === 'open' && g.phase === 'lobby');
-    var h = '<div class="ltop"><div class="logo s">400</div>' + (ready ? '<span class="chip">Table <b>' + esc(code) + '</b></span>' : '') + '<button class="ghost" id="leaveL" type="button">Leave</button></div>';
+    var h = '<div class="ltop"><div class="logo s">400</div>' + '<button class="ghost" id="leaveL" type="button">Leave</button></div>';
     if (net === 'opening') h += '<p class="lmsg">Connecting…</p>';
     else if (net === 'notfound') h += '<p class="lmsg">No table with the code ' + esc(code) + ' is answering. Ask the host to keep the game open on their screen. Still trying…</p>';
     else if (net === 'error') h += '<p class="lmsg">Could not connect. Check your internet connection, then go back and try again.</p>';
@@ -1166,9 +1173,9 @@ if (typeof module !== 'undefined') module.exports = E;
     if ($('inviteF')) $('inviteF').onclick = inviteSheet;
   }
   function lobbySettings(){
-    openSheet('lset', '<h2>Table settings</h2><div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div></div>' +
+    openSheet('lset', '<h2>Table settings</h2>' +
       '<label class="field" for="nick">Your name at the table<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>' +
-      '<p>Friends can join with the code or with your invite link. Partners sit across from each other.</p>' +
+      '<p>Partners sit across from each other. Bots take any open seat when the game starts.</p>' +
       '<button class="primary" id="go" type="button">Done</button>');
     wireCommon($('box'));
     $('go').onclick = function(){ var n = $('nick'); if (n && n.onchange) n.onchange.call(n); sheetKind = ''; $('sheet').hidden = true; drawLobby(); };
@@ -1608,11 +1615,13 @@ if (typeof module !== 'undefined') module.exports = E;
   $('rulesBtn').onclick = rulesSheet;
   $('hProfile').onclick = $('hGear').onclick = $('hTabP').onclick = function(){ profileSheet(); };
   $('hRules').onclick = rulesSheet; $('hFr').onclick = $('hBell').onclick = function(){ friendsSheet(); };
-  $('hJoinBtn').onclick = function(){
+  var JOINLINK = '<p class="fine"><button type="button" class="linkbtn" id="fjoin">Have a table code? Join with it</button></p>';
+  function wireJoin(){ if ($('fjoin')) $('fjoin').onclick = joinSheet; }
+  function joinSheet(){
     openSheet('join', '<h2>Join a table</h2><p>Enter the four-character code your friend sent you.</p><form id="hJoin" class="joinrow" style="margin:0 0 14px"><input id="hCode" maxlength="4" placeholder="Table code" autocapitalize="characters" autocomplete="off" aria-label="Table code"><button class="primary" type="submit" style="width:auto;padding:12px 18px">Join</button></form><button class="second" id="go" type="button">Cancel</button>');
     $('go').onclick = closeSheet;
     $('hJoin').onsubmit = function(e){ e.preventDefault(); var c = $('hCode').value; sheetKind = ''; $('sheet').hidden = true; $('hNote').textContent = ''; joinLobby(c); };
-  };
+  }
   $('hSkill').onclick = function skill(){
     openSheet('skill', '<h2>Bot skill</h2><p>How strong each bot is in your next game. You can change it again before every game.</p>' + lvRows([2,1,3], ['your partner','on your right','on your left']) + '<button class="primary" id="go" type="button">Done</button>');
     wireLv($('box'), skill); $('go').onclick = closeSheet;
