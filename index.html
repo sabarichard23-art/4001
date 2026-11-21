@@ -324,10 +324,8 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
         <div class="hfan" aria-hidden="true"><i style="--r:-18deg;--x:-66px;--y:10px"><b>J</b><s>♣</s></i><i class="red" style="--r:-6deg;--x:-22px;--y:0px"><b>Q</b><s>♦</s></i><i style="--r:6deg;--x:22px;--y:0px"><b>K</b><s>♠</s></i><i class="red" style="--r:18deg;--x:66px;--y:10px"><b>A</b><s>♥</s></i></div>
         <div class="ht">Tarneeb 400</div>
         <p>Hearts are trump. First to 41.</p>
-        <button class="primary" id="hFriends" type="button">Open a table</button>
+        <button class="primary" id="hFriends" type="button">Start game</button>
       </div>
-      <div class="htiles one"><button class="tile" id="hBots" type="button">Quick game vs bots</button></div>
-      <button class="second" id="hNew" type="button" hidden>Start a new game vs bots</button>
       <p id="hNote" aria-live="polite"></p>
       <div class="hfr"><div class="hfrh"><strong>Friends</strong><span id="hFrN"></span></div><div id="hFrs"></div></div>
       <div class="htiles"><button class="tile" id="hRules" type="button">Rules</button><button class="tile" id="hSkill" type="button">Bot skill</button><button class="tile" id="hRecord" type="button">My record</button></div>
@@ -879,8 +877,8 @@ if (typeof module !== 'undefined') module.exports = E;
     });
     g.dealer = (g.dealer + 1) & 3;
     g.sum = {rows:rows, win:E.gameWinner(g.scores)};
-    if (g.sum.win < 0) save(); else if (mode === 'solo') {
-      try { localStorage.removeItem(KEY); var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'), lk = 'L' + Math.min(lv[1], lv[3]); rec[lk] = rec[lk] || [0, 0]; rec[lk][g.sum.win === 0 ? 0 : 1]++; localStorage.setItem(RKEY, JSON.stringify(rec)); } catch(e){}
+    if (g.sum.win < 0) save(); else if (mySeat >= 0 && (mode === 'solo' || mode === 'host') && [1,2,3].every(function(k){ return isBot((mySeat + k) & 3); })) {
+      try { localStorage.removeItem(KEY); var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'), lk = 'L' + Math.min(lv[(mySeat + 1) & 3], lv[(mySeat + 3) & 3]); rec[lk] = rec[lk] || [0, 0]; rec[lk][g.sum.win === (mySeat & 1) ? 0 : 1]++; localStorage.setItem(RKEY, JSON.stringify(rec)); } catch(e){}
     }
     render(); showEnd();
   }
@@ -888,9 +886,7 @@ if (typeof module !== 'undefined') module.exports = E;
   /* ---------- home and waiting room ---------- */
   function drawHome(){
     var s = load();
-    $('hBots').textContent = s ? 'Continue vs bots' : 'Quick game vs bots';
     if (!$('hFrs').innerHTML) drawFriendsHome();
-    $('hNew').hidden = !s;
     var w = 0, l = 0, lines = [];
     try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) { w += r[0]; l += r[1]; lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); } }); } catch(e){}
     $('hAv').innerHTML = avatar(0);
@@ -1139,9 +1135,10 @@ if (typeof module !== 'undefined') module.exports = E;
   function drawLobby(){
     if (screen !== 'lobby') return;
     lobbyDirty = false;
-    var ready = g && (mode === 'host' ? net === 'open' : net === 'open' && g.phase === 'lobby');
+    var ready = g && (mode === 'host' || (net === 'open' && g.phase === 'lobby'));
     var h = '<div class="ltop"><div class="logo s">400</div>' + '<button class="ghost" id="leaveL" type="button">Leave</button></div>';
-    if (net === 'opening') h += '<p class="lmsg">Connecting…</p>';
+    if (mode === 'host') {}
+    else if (net === 'opening') h += '<p class="lmsg">Connecting…</p>';
     else if (net === 'notfound') h += '<p class="lmsg">No table with the code ' + esc(code) + ' is answering. Ask the host to keep the game open on their screen. Still trying…</p>';
     else if (net === 'error') h += '<p class="lmsg">Could not connect. Check your internet connection, then go back and try again.</p>';
     else if (net === 'lost') h += '<p class="lmsg">Lost the connection to the host. Trying to reconnect…</p>';
@@ -1151,7 +1148,7 @@ if (typeof module !== 'undefined') module.exports = E;
         (host ? '<button class="primary" id="start" type="button">Start game</button>' : '<p>Waiting for ' + esc(hostName || 'the host') + ' to start the game.</p>') +
         '<button class="primary alt" id="inviteF" type="button">Invite friends</button>' +
         '<button class="second" id="lset" type="button">Table settings</button>' +
-        '<p>Bots take any open seat when the game starts.</p></div></div>';
+        '<p>' + (!host || net === 'open' ? 'Bots take any open seat when the game starts.' : net === 'opening' ? 'Connecting so friends can join.' : 'No connection, so friends cannot join right now. You can still play with bots.') + '</p></div></div>';
       if (mySeat >= 0) h += '<div class="lme">' + avatar(mySeat) + '<div><strong>' + esc(nick || (host ? 'Host' : 'You')) + ' (you)</strong><span>' +
         (host ? (n ? n + (n === 1 ? ' friend' : ' friends') + ' connected' : 'No friends connected yet') + ' · ' + open + (open === 1 ? ' seat open' : ' seats open') : 'Your partner sits across from you') +
         '</span></div><button class="ghost" type="button" data-stand="1">Stand up</button></div>';
@@ -1637,8 +1634,6 @@ if (typeof module !== 'undefined') module.exports = E;
     if (mode === 'solo' && g) { netGen++; mode = 'host'; g.nm[mySeat] = nick || 'Host'; openHost(); headerState(); }
     tableSheet();
   };
-  $('hBots').onclick = function(){ startSolo(false); };
-  $('hNew').onclick = function(){ startSolo(true); };
   $('hFriends').onclick = hostLobby;
 
   var m = /[?&]room=([A-Za-z0-9]{4})/.exec(location.search);
