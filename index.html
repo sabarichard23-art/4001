@@ -198,6 +198,35 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
 @media (max-height:700px){#hand{height:132px}#hand .card{height:120px;width:84px}#hand .card .pip{font-size:48px}.av{width:50px;height:50px}.seat.top{top:-52px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
+
+/* home hub and table lobby */
+.logo.s{font-size:38px;letter-spacing:0;text-shadow:none;line-height:1}
+.htop,.ltop{display:flex;align-items:center;gap:8px;width:100%}.htop .logo,.ltop .logo{margin-right:auto}
+#home{justify-content:flex-start;overflow:auto}#home .stack{margin:auto 0;max-width:380px}
+.hprof{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#1a1f27;border:1px solid var(--line);border-radius:16px;padding:10px 14px;color:var(--text)}
+.hprof .av{width:52px;height:52px;flex:none}.hwho{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.25}
+.hwho strong{font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#hRec{text-align:left;font-size:13px}
+.hedit{font-size:13px;font-weight:600;color:var(--brass)}
+.hero{border-radius:22px;border:6px solid transparent;background:radial-gradient(ellipse at 50% 30%,var(--felt-hi),var(--felt) 75%) padding-box,linear-gradient(165deg,var(--rail-a),var(--rail-b)) border-box;padding:18px 16px 16px;box-shadow:0 12px 26px rgba(0,0,0,.5),inset 0 0 40px rgba(0,0,0,.35)}
+.hk{font-size:12px;color:rgba(240,235,225,.85);letter-spacing:.3px}
+.ht{font-family:var(--display);font-weight:700;font-size:32px;line-height:1.05;margin:4px 0 6px;color:var(--paper)}
+.hero p{margin:0 0 14px;font-size:14px;line-height:1.4;color:rgba(240,235,225,.9)}
+#lobby{overflow:auto;padding-left:0!important;padding-right:0!important}
+#lobbyBox{background:none;border:0;box-shadow:none;padding:0 16px 20px;max-height:none;overflow:visible;margin:0 auto}
+.chip{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;color:var(--muted)}
+.chip b{font-family:var(--display);font-size:16px;letter-spacing:2px;color:var(--text);margin-left:4px}
+.lmsg{margin:40px 0 20px!important;text-align:center}
+.ltable{position:relative;height:400px;margin:72px 2px 0;border-radius:34px;border:8px solid transparent;background:radial-gradient(ellipse at 50% 40%,var(--felt-hi),var(--felt) 72%) padding-box,linear-gradient(165deg,var(--rail-a),var(--rail-b)) border-box;box-shadow:0 14px 30px rgba(0,0,0,.6),inset 0 0 50px rgba(0,0,0,.4)}
+.lseat{position:absolute;width:96px;display:flex;flex-direction:column;align-items:center;z-index:2}
+.lseat.top{left:50%;margin-left:-48px;top:-62px}.lseat.left{left:-24px;top:128px}.lseat.right{right:-24px;top:128px}
+.lseat .tally{font-size:12px;padding:2px 9px}
+.plus{width:60px;height:60px;border-radius:50%;background:#10151b;border:2px dashed #9aa3ad;color:var(--text);font-size:30px;line-height:1;padding:0}
+.lmenu{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:214px;background:rgba(8,16,14,.94);border:1px solid rgba(227,189,106,.4);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 30px rgba(0,0,0,.6)}
+.lmenu .second{margin:0;background:#2a313c;border:0}.lmenu p{margin:0;text-align:center;font-size:12px;line-height:1.4;color:#c9d1d9}
+.lme{display:flex;align-items:center;gap:10px;margin:18px 0 12px}.lme .av{width:42px;height:42px;flex:none}
+.lme div:not(.av){flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.lme strong{font-size:14px}.lme span{font-size:12px;color:var(--muted)}
+.lcard{background:#1a1f27;border:1px solid var(--line);border-radius:16px;padding:14px 14px 2px}
+@media (max-height:700px){.ltable{height:340px}.lseat.left,.lseat.right{top:100px}}
 </style>
 </head>
 <body>
@@ -230,18 +259,22 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
   </footer>
   <div id="sheet" hidden><div class="box" id="box"></div></div>
   <div id="home" class="screen">
-    <div class="logo">400</div>
-    <p class="tag">Hearts are trump. First to 41.</p>
     <div class="stack">
-      <button class="primary" id="hBots" type="button">Play with bots</button>
-      <button class="second" id="hNew" type="button" hidden>Start a new game with bots</button>
-      <button class="primary alt" id="hFriends" type="button">Play with friends</button>
+      <div class="htop"><div class="logo s">400</div><button class="ghost" id="hRules" type="button">Rules</button></div>
+      <button class="hprof" id="hProfile" type="button" aria-label="Your profile"><span id="hAv"></span><span class="hwho"><strong id="hName">Player</strong><span id="hRec"></span></span><span class="hedit">Edit</span></button>
+      <div class="hero">
+        <div class="hk">Hearts are trump · First to 41</div>
+        <div class="ht">Play 400 with friends</div>
+        <p>Open a table, invite who you want, and start when you are ready. Bots fill empty seats.</p>
+        <button class="primary" id="hFriends" type="button">Open a table</button>
+      </div>
+      <button class="primary alt" id="hBots" type="button">Quick game vs bots</button>
+      <button class="second" id="hNew" type="button" hidden>Start a new game vs bots</button>
       <form id="hJoin" class="joinrow">
         <input id="hCode" maxlength="4" placeholder="Table code" autocapitalize="characters" autocomplete="off" aria-label="Table code">
         <button class="second" type="submit">Join a table</button>
       </form>
       <p id="hNote" aria-live="polite"></p>
-      <p id="hRec"></p>
       <p class="fine"><a href="privacy.html">Privacy</a></p>
     </div>
   </div>
@@ -793,11 +826,21 @@ if (typeof module !== 'undefined') module.exports = E;
   /* ---------- home and waiting room ---------- */
   function drawHome(){
     var s = load();
-    $('hBots').textContent = s ? 'Continue with bots' : 'Play with bots';
+    $('hBots').textContent = s ? 'Continue vs bots' : 'Quick game vs bots';
     $('hNew').hidden = !s;
-    var lines = [];
-    try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); }); } catch(e){}
-    $('hRec').textContent = lines.length ? 'Your record against ' + lines.join(' \u00b7 ') : '';
+    var w = 0, l = 0, lines = [];
+    try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) { w += r[0]; l += r[1]; lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); } }); } catch(e){}
+    $('hAv').innerHTML = avatar(0);
+    $('hName').textContent = nick || 'Player';
+    $('hRec').textContent = (w + l) ? w + (w === 1 ? ' win' : ' wins') + ' · ' + l + (l === 1 ? ' loss' : ' losses') + ' vs bots' : 'No games finished yet';
+    recLines = lines;
+  }
+  var recLines = [];
+  function profileSheet(){
+    openSheet('me', '<h2>Your profile</h2><label class="field" for="nick">Your name<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>' +
+      '<p>' + (recLines.length ? 'Your record against ' + esc(recLines.join(' · ')) : 'Finish a game against bots and your record shows here.') + '</p>' +
+      '<button class="primary" id="go" type="button">Done</button>');
+    $('go').onclick = function(){ nick = cleanName($('nick').value); try { localStorage.setItem(NKEY, nick); } catch(e){} sheetKind = ''; $('sheet').hidden = true; drawHome(); };
   }
   function startSolo(fresh){
     closeNet(); mode = 'solo'; myPeer = 'host'; mySeat = 0; g = null;
@@ -874,31 +917,53 @@ if (typeof module !== 'undefined') module.exports = E;
       n.onblur = function(){ setTimeout(function(){ if (lobbyDirty && screen === 'lobby') drawLobby(); }, 0); };
     }
   }
+  function lseat(p, where){
+    var team = ((p - view()) & 1) ? '' : ' us';
+    if (!isBot(p)) return '<div class="lseat ' + where + team + '">' + avatar(p) + '<div class="nm">' + esc(g.nm[p] || 'Friend') + '</div><div class="tally">Ready</div></div>';
+    return '<div class="lseat ' + where + team + '"><button type="button" class="plus" data-sit="' + p + '" aria-label="Sit in this seat">+</button><div class="nm">Open seat</div><div class="tally">' + LEVELS[lv[p]] + ' bot</div></div>';
+  }
   function drawLobby(){
     if (screen !== 'lobby') return;
-    var ae = document.activeElement;
-    if (ae && (ae.id === 'nick' || ae.tagName === 'SELECT') && $('lobby').contains(ae)) { lobbyDirty = true; return; }
     lobbyDirty = false;
-    var h = '<h2>Waiting room</h2>', ready = g && (mode === 'host' ? net === 'open' : net === 'open' && g.phase === 'lobby');
-    if (net === 'opening') h += '<p>Connecting…</p>';
-    else if (net === 'notfound') h += '<p>No table with the code ' + esc(code) + ' is answering. Ask the host to keep the game open on their screen. Still trying\u2026</p>';
-    else if (net === 'error') h += '<p>Could not connect. Check your internet connection, then go back and try again.</p>';
-    else if (net === 'lost') h += '<p>Lost the connection to the host. Trying to reconnect…</p>';
+    var ready = g && (mode === 'host' ? net === 'open' : net === 'open' && g.phase === 'lobby');
+    var h = '<div class="ltop"><div class="logo s">400</div>' + (ready ? '<span class="chip">Table <b>' + esc(code) + '</b></span>' : '') + '<button class="ghost" id="leaveL" type="button">Leave</button></div>';
+    if (net === 'opening') h += '<p class="lmsg">Connecting…</p>';
+    else if (net === 'notfound') h += '<p class="lmsg">No table with the code ' + esc(code) + ' is answering. Ask the host to keep the game open on their screen. Still trying…</p>';
+    else if (net === 'error') h += '<p class="lmsg">Could not connect. Check your internet connection, then go back and try again.</p>';
+    else if (net === 'lost') h += '<p class="lmsg">Lost the connection to the host. Trying to reconnect…</p>';
     if (ready) {
-      h += codeBar();
-      h += '<label class="field" for="nick">Your name at the table<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>';
-      h += '<p>Pick a chair. Partners sit across from each other, and bots take any empty chair.</p>' + chairsHtml();
-      if (mode === 'host') {
-        var n = peersNow.length;
-        h += '<p>' + (n ? n + (n === 1 ? ' friend is' : ' friends are') + ' connected.' : 'No friends connected yet. Send them the invite.') + '</p>';
-        h += '<button class="primary" id="start" type="button">Start game</button>';
-      } else h += '<p>Waiting for ' + esc(hostName || 'the host') + ' to start the game.</p>';
+      var v = view(), host = mode === 'host', open = [0,1,2,3].filter(isBot).length, n = peersNow.length;
+      h += '<div class="ltable">' + lseat((v + 2) & 3, 'top') + lseat((v + 3) & 3, 'left') + lseat((v + 1) & 3, 'right') + '<div class="lmenu">' +
+        (host ? '<button class="primary" id="start" type="button">Start game</button>' : '<p>Waiting for ' + esc(hostName || 'the host') + ' to start the game.</p>') +
+        '<button class="primary alt" id="invite" type="button">Invite friends</button>' +
+        '<button class="second" id="lset" type="button">Table settings</button>' +
+        '<p>Bots take any open seat when the game starts.</p></div></div>';
+      if (mySeat >= 0) h += '<div class="lme">' + avatar(mySeat) + '<div><strong>' + esc(nick || (host ? 'Host' : 'You')) + ' (you)</strong><span>' +
+        (host ? (n ? n + (n === 1 ? ' friend' : ' friends') + ' connected' : 'No friends connected yet') + ' · ' + open + (open === 1 ? ' seat open' : ' seats open') : 'Your partner sits across from you') +
+        '</span></div><button class="ghost" type="button" data-stand="1">Stand up</button></div>';
+      else h += '<div class="lme"><div><strong>You are watching</strong><span>' + (isBot(v) ? 'The seat in front of you is open' : esc(g.nm[v] || 'A friend') + ' has this seat') + '</span></div>' +
+        (isBot(v) ? '<button class="ghost" type="button" data-sit="' + v + '">Sit here</button>' : '') + '</div>';
+      if (host) {
+        var bs = [(v + 2) & 3, (v + 1) & 3, (v + 3) & 3].filter(isBot);
+        if (mySeat < 0 && isBot(v)) bs.push(v);
+        if (bs.length) h += '<div class="lcard">' + lvRows(bs, bs.map(function(p){ return ['your seat','on your right','across from you','on your left'][(p - v) & 3]; })) + '</div>';
+      }
     }
-    h += '<button class="second" id="leaveL" type="button">Back to home</button>';
     $('lobbyBox').innerHTML = h;
-    wireCommon($('lobbyBox')); wireChairs($('lobbyBox'));
+    wireCommon($('lobbyBox'));
+    Array.prototype.forEach.call($('lobbyBox').querySelectorAll('[data-sit],[data-stand]'), function(b){ b.onclick = function(){ sit(b.dataset.stand ? -1 : +b.dataset.sit); }; });
+    wireLv($('lobbyBox'), function(){ drawLobby(); publish(); });
     $('leaveL').onclick = goHome;
     if ($('start')) $('start').onclick = function(){ newGame(); show('table'); };
+    if ($('lset')) $('lset').onclick = lobbySettings;
+  }
+  function lobbySettings(){
+    openSheet('lset', '<h2>Table settings</h2><div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div></div>' +
+      '<label class="field" for="nick">Your name at the table<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>' +
+      '<p>Friends can join with the code or with your invite link. Partners sit across from each other.</p>' +
+      '<button class="primary" id="go" type="button">Done</button>');
+    wireCommon($('box'));
+    $('go').onclick = function(){ var n = $('nick'); if (n && n.onchange) n.onchange.call(n); sheetKind = ''; $('sheet').hidden = true; drawLobby(); };
   }
   function hostLobby(){
     closeNet(); mode = 'host'; myPeer = 'host'; mySeat = 0; gen++; sched = -1; pickBots();
@@ -1333,6 +1398,7 @@ if (typeof module !== 'undefined') module.exports = E;
     setTimeout(function(){ armed = 0; b.textContent = 'Home'; }, 3000);
   };
   $('rulesBtn').onclick = rulesSheet;
+  $('hProfile').onclick = profileSheet; $('hRules').onclick = rulesSheet;
   $('botsBtn').onclick = botsSheet;
   $('tableBtn').onclick = function(){
     // from a game against bots: open the same game to friends, who can take over bot chairs
