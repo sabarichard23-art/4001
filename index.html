@@ -227,6 +227,54 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
 .lme div:not(.av){flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.lme strong{font-size:14px}.lme span{font-size:12px;color:var(--muted)}
 .lcard{background:#1a1f27;border:1px solid var(--line);border-radius:16px;padding:14px 14px 2px}
 @media (max-height:700px){.ltable{height:340px}.lseat.left,.lseat.right{top:100px}}
+
+#hFr.dot{border-color:var(--brass);color:var(--brass)}
+#hInv:empty{display:none}#hInv{display:flex;flex-direction:column;gap:8px}
+.inv{display:flex;align-items:center;gap:8px;background:#10151b;border:1px solid var(--brass);border-radius:14px;padding:10px 12px}
+.inv div{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}.inv span{font-size:12px;color:var(--muted)}
+.inv .primary{width:auto;padding:10px 16px}
+.avgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:4px}
+.avgrid button{background:none;border:0;padding:0;border-radius:50%;aspect-ratio:1}
+.avgrid .av{width:100%;height:100%;border-width:2px}
+.avgrid button[aria-checked="true"] .av{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass)}
+.frow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.frow .av{width:42px;height:42px;flex:none;border-width:2px}
+.frow div:not(.av){flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.frow strong{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frow span{font-size:12px;color:var(--muted)}
+.frow .primary{width:auto;padding:9px 14px;font-size:14px}.frow .ghost{min-height:40px}
+.fh{margin:14px 0 2px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.second.danger{border-color:#7a2a25;color:#ff9c94}
+#pmsg:empty,#fmsg:empty{display:none}#pmsg,#fmsg{color:var(--them)!important}
+
+/* home hub, design 5 */
+#home{padding-bottom:calc(74px + env(safe-area-inset-bottom))!important}
+#home .stack{gap:14px;margin:0;max-width:420px}
+.htop{gap:10px}
+.hprof{flex:1;min-width:0;background:none;border:0;padding:0;border-radius:12px}
+.hprof .av{border-color:var(--brass)}
+.hic{position:relative;width:44px;height:44px;flex:none;border-radius:50%;background:#1a1f27;border:1px solid var(--line);color:var(--text);display:flex;align-items:center;justify-content:center;padding:0}
+.hic b{position:absolute;right:-2px;top:-4px;min-width:18px;height:18px;border-radius:9px;background:#c9261d;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.hic b[hidden]{display:none}
+.hero{text-align:center;padding:14px 20px 20px;border-width:8px;border-radius:26px}
+.hfan{position:relative;height:96px}
+.hfan i{position:absolute;left:50%;top:6px;width:58px;height:84px;margin-left:-29px;background:#fff;border-radius:8px;border:1px solid rgba(0,0,0,.35);box-shadow:0 4px 8px rgba(0,0,0,.4);transform:translate(var(--x),var(--y)) rotate(var(--r));color:var(--card-ink,#15181d);font-style:normal;text-align:left;padding:3px 0 0 6px;font-family:var(--display);font-weight:700;line-height:.95}
+.hfan i.red{color:#c9261d}.hfan b{display:block;font-size:26px}.hfan s{display:block;font-size:20px;text-decoration:none}
+.hero .ht{font-size:46px;margin:6px 0 2px}.hero p{margin:0 0 18px;font-size:13px}
+.hero .primary{padding:16px;font-size:18px;border-radius:14px}
+.htiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.htiles.two{grid-template-columns:1fr 1fr}
+.tile{min-height:52px;background:#1a1f27;border:1px solid var(--line);border-radius:14px;color:var(--text);font-weight:600;font-size:14px;padding:8px 6px}
+#hBots.tile{min-height:56px;font-size:15px}#hJoinBtn{min-height:56px;font-size:15px}
+.hfrh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}.hfrh strong{font-size:15px}.hfrh span{font-size:12px;color:var(--muted)}
+#hFrs{display:flex;gap:14px;overflow-x:auto;padding-bottom:2px}
+.hf{background:none;border:0;padding:0;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;width:56px;flex:none}
+.hf .av{width:50px;height:50px;border-color:var(--us)}.hf span{max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hf .plus{width:48px;height:48px;font-size:26px;display:flex;align-items:center;justify-content:center}
+.htabs{position:absolute;left:0;right:0;bottom:0;display:flex;background:#12161d;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:2}
+.htabs button{flex:1;min-height:60px;background:none;border:0;color:var(--muted);font-weight:600;font-size:13px;position:relative}
+.htabs button.on{color:var(--text)}.htabs button.on::before{content:"";position:absolute;left:50%;top:12px;width:28px;height:3px;margin-left:-14px;border-radius:2px;background:var(--brass)}
+.htabs button.dot{color:var(--brass)}
+.inv .av{width:40px;height:40px;flex:none;border-width:2px}.inv .primary{background:#63d0ac;box-shadow:none}
+#home .fine{margin:0}
 </style>
 </head>
 <body>
@@ -260,23 +308,26 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
   <div id="sheet" hidden><div class="box" id="box"></div></div>
   <div id="home" class="screen">
     <div class="stack">
-      <div class="htop"><div class="logo s">400</div><button class="ghost" id="hRules" type="button">Rules</button></div>
-      <button class="hprof" id="hProfile" type="button" aria-label="Your profile"><span id="hAv"></span><span class="hwho"><strong id="hName">Player</strong><span id="hRec"></span></span><span class="hedit">Edit</span></button>
+      <div class="htop">
+        <button class="hprof" id="hProfile" type="button" aria-label="Your profile"><span id="hAv"></span><span class="hwho"><strong id="hName">Player</strong><span id="hRec"></span></span></button>
+        <button class="hic" id="hBell" type="button" aria-label="Friend requests and invites"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="hBadge" hidden></b></button>
+        <button class="hic" id="hGear" type="button" aria-label="Edit your profile"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4L18 18M18 6l-1.6 1.6M7.6 16.4L6 18"/></svg></button>
+      </div>
+      <div id="hInv" aria-live="polite"></div>
       <div class="hero">
-        <div class="hk">Hearts are trump · First to 41</div>
-        <div class="ht">Play 400 with friends</div>
-        <p>Open a table, invite who you want, and start when you are ready. Bots fill empty seats.</p>
+        <div class="hfan" aria-hidden="true"><i style="--r:-18deg;--x:-66px;--y:10px"><b>J</b><s>♣</s></i><i class="red" style="--r:-6deg;--x:-22px;--y:0px"><b>Q</b><s>♦</s></i><i style="--r:6deg;--x:22px;--y:0px"><b>K</b><s>♠</s></i><i class="red" style="--r:18deg;--x:66px;--y:10px"><b>A</b><s>♥</s></i></div>
+        <div class="ht">Tarneeb 400</div>
+        <p>Hearts are trump. First to 41.</p>
         <button class="primary" id="hFriends" type="button">Open a table</button>
       </div>
-      <button class="primary alt" id="hBots" type="button">Quick game vs bots</button>
+      <div class="htiles two"><button class="tile" id="hBots" type="button">Quick game vs bots</button><button class="tile" id="hJoinBtn" type="button">Join with a code</button></div>
       <button class="second" id="hNew" type="button" hidden>Start a new game vs bots</button>
-      <form id="hJoin" class="joinrow">
-        <input id="hCode" maxlength="4" placeholder="Table code" autocapitalize="characters" autocomplete="off" aria-label="Table code">
-        <button class="second" type="submit">Join a table</button>
-      </form>
       <p id="hNote" aria-live="polite"></p>
+      <div class="hfr"><div class="hfrh"><strong>Friends</strong><span id="hFrN"></span></div><div id="hFrs"></div></div>
+      <div class="htiles"><button class="tile" id="hRules" type="button">Rules</button><button class="tile" id="hSkill" type="button">Bot skill</button><button class="tile" id="hRecord" type="button">My record</button></div>
       <p class="fine"><a href="privacy.html">Privacy</a></p>
     </div>
+    <div class="htabs"><button type="button" class="on" aria-current="page">Home</button><button type="button" id="hFr">Friends</button><button type="button" id="hTabP">Profile</button></div>
   </div>
   <div id="lobby" class="screen" hidden><div class="box" id="lobbyBox"></div></div>
 </div>
@@ -736,8 +787,13 @@ if (typeof module !== 'undefined') module.exports = E;
     {bg:'#3878b4', shirt:'#1d2430', skin:'#cf9a6d', hair:'#1d1a1c', extra:'<path d="M25 34c0-11 7-17 15-17s15 6 15 17c-3-6-8-9-15-9s-12 3-15 9z"/><path d="M26 40c1 10 6 14 14 14s13-4 14-14c-3 4-8 6-14 6s-11-2-14-6z"/>'},
     {bg:'#8a62b3', shirt:'#e8d9b0', skin:'#dca77c', hair:'#3b3f48', extra:'<path d="M24 31c1-9 8-15 16-15s15 6 16 15z"/><rect x="21" y="29" width="40" height="4" rx="2"/>'}
   ];
-  function avatar(p){
-    var a = AV[p];
+  var AVBG = ['', '#b0843a', '#4f6fb8'], myAv = -1;
+  try { var sav = localStorage.getItem('solo400av'); if (sav !== null && sav !== '') myAv = (+sav) % 12; } catch(e){}
+  function avatar(p, idx){
+    if (idx == null && g && p === mySeat && myAv >= 0) idx = myAv;
+    if (idx == null && !g && myAv >= 0) idx = myAv;
+    var a = AV[idx != null ? idx % 4 : p];
+    if (idx != null && idx >= 4) a = {bg:AVBG[(idx / 4) | 0], shirt:a.shirt, skin:a.skin, hair:a.hair, extra:a.extra};
     return '<div class="av"><svg viewBox="0 0 80 80" aria-hidden="true"><rect width="80" height="80" fill="' + a.bg + '"/>' +
       '<path d="M10 82c0-17 13-25 30-25s30 8 30 25z" fill="' + a.shirt + '"/><circle cx="40" cy="36" r="15" fill="' + a.skin + '"/>' +
       '<g fill="' + a.hair + '">' + a.extra + '</g></svg></div>';
@@ -827,6 +883,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function drawHome(){
     var s = load();
     $('hBots').textContent = s ? 'Continue vs bots' : 'Quick game vs bots';
+    if (!$('hFrs').innerHTML) drawFriendsHome();
     $('hNew').hidden = !s;
     var w = 0, l = 0, lines = [];
     try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) { w += r[0]; l += r[1]; lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); } }); } catch(e){}
@@ -834,13 +891,163 @@ if (typeof module !== 'undefined') module.exports = E;
     $('hName').textContent = nick || 'Player';
     $('hRec').textContent = (w + l) ? w + (w === 1 ? ' win' : ' wins') + ' · ' + l + (l === 1 ? ' loss' : ' losses') + ' vs bots' : 'No games finished yet';
     recLines = lines;
+    drawFriendsHome();
   }
   var recLines = [];
-  function profileSheet(){
-    openSheet('me', '<h2>Your profile</h2><label class="field" for="nick">Your name<input id="nick" maxlength="12" autocomplete="off" value="' + esc(nick) + '"></label>' +
-      '<p>' + (recLines.length ? 'Your record against ' + esc(recLines.join(' · ')) : 'Finish a game against bots and your record shows here.') + '</p>' +
-      '<button class="primary" id="go" type="button">Done</button>');
-    $('go').onclick = function(){ nick = cleanName($('nick').value); try { localStorage.setItem(NKEY, nick); } catch(e){} sheetKind = ''; $('sheet').hidden = true; drawHome(); };
+  /* ---------- accounts, friends and invites (Firebase) ---------- */
+  var me = null, fbUp = false, friends = [], invites = [], profs = {}, invited = {}, fbMsg = '';
+  function fb(){ return window.FB || null; }
+  function typing(){ var ae = document.activeElement; return ae && ae.tagName === 'INPUT' && $('box').contains(ae); }
+  function refreshSheets(){
+    if ($('sheet').hidden || typing()) return;
+    if (sheetKind === 'friends') friendsSheet(); else if (sheetKind === 'invitef') inviteSheet();
+  }
+  function startFB(){
+    var F = fb(); if (!F) return;
+    F.ready(function(uid){
+      fbUp = true;
+      F.getProfile(uid).then(function(p){
+        me = p;
+        if (p) { nick = cleanName(p.name); myAv = p.avatar | 0; try { localStorage.setItem(NKEY, nick); localStorage.setItem('solo400av', myAv); } catch(e){} }
+        if (screen === 'home') drawHome();
+      }).catch(function(){});
+      F.watchFriends(function(list){
+        if (!list) return;
+        friends = list;
+        list.forEach(function(f){ if (!profs[f.uid]) F.getProfile(f.uid).then(function(p){ profs[f.uid] = p || {name:'Player', handle:'', avatar:0}; drawFriendsHome(); refreshSheets(); }).catch(function(){}); });
+        drawFriendsHome(); refreshSheets();
+      });
+      F.watchInvites(function(list){
+        if (!list) return;
+        var now = Date.now();
+        invites = list.filter(function(v){ if (now - v.at > 15 * 60000) { F.deleteInvite(v.id).catch(function(){}); return false; } return true; });
+        drawFriendsHome();
+      });
+    });
+  }
+  function drawFriendsHome(){
+    if (!$('hFr')) return;
+    var req = friends.filter(function(f){ return f.status === 'pending' && !f.mine; }).length;
+    var n = friends.filter(function(f){ return f.status === 'accepted'; }).length;
+    $('hFr').classList.toggle('dot', req > 0);
+    $('hBadge').hidden = !(req + invites.length); $('hBadge').textContent = req + invites.length;
+    $('hFrN').textContent = n ? n + (n === 1 ? ' friend' : ' friends') : (req ? req + (req === 1 ? ' request' : ' requests') : '');
+    var fs = '';
+    friends.forEach(function(f){ if (f.status !== 'accepted') return; var p = profs[f.uid] || {name:'Player', avatar:0}; fs += '<button class="hf" type="button">' + avatar(0, p.avatar | 0) + '<span>' + esc(cleanName(p.name) || 'Player') + '</span></button>'; });
+    $('hFrs').innerHTML = fs + '<button class="hf" type="button" aria-label="Add a friend"><span class="plus" aria-hidden="true">+</span><span>Add</span></button>';
+    Array.prototype.forEach.call($('hFrs').querySelectorAll('button'), function(b){ b.onclick = function(){ friendsSheet(); }; });
+    var h = '';
+    invites.forEach(function(v){
+      var ip = profs[v.from];
+      h += '<div class="inv">' + (ip ? avatar(0, ip.avatar | 0) : '') + '<div><strong>' + esc(cleanName(v.fromName) || 'A friend') + ' invited you</strong><span>Table ' + esc(v.code) + ' · waiting to start</span></div>' +
+        '<button class="primary" type="button" data-join="' + esc(v.id) + '">Join</button><button class="ghost" type="button" data-skip="' + esc(v.id) + '" aria-label="Dismiss invite">Not now</button></div>';
+    });
+    $('hInv').innerHTML = h;
+    Array.prototype.forEach.call($('hInv').querySelectorAll('button'), function(b){
+      b.onclick = function(){
+        var id = b.dataset.join || b.dataset.skip, v = invites.filter(function(x){ return x.id === id; })[0];
+        invites = invites.filter(function(x){ return x.id !== id; });
+        if (fb()) fb().deleteInvite(id).catch(function(){});
+        if (b.dataset.join && v) joinLobby(v.code); else drawFriendsHome();
+      };
+    });
+  }
+  function avGrid(sel){
+    var h = '<div class="avgrid" role="radiogroup" aria-label="Your picture">';
+    for (var i = 0; i < 12; i++) h += '<button type="button" role="radio" aria-checked="' + (i === sel) + '" aria-label="Picture ' + (i + 1) + '" data-av="' + i + '">' + avatar(0, i) + '</button>';
+    return h + '</div>';
+  }
+  function profileSheet(msg, draft){
+    var d = draft || {name:nick || (me && me.name) || '', handle:(me && me.handle) || '', av:myAv >= 0 ? myAv : 0};
+    var on = fbUp && fb();
+    openSheet('me', '<h2>Your profile</h2>' +
+      '<label class="field" for="nick">Your name<input id="nick" maxlength="12" autocomplete="off" value="' + esc(d.name) + '"></label>' +
+      (on ? '<label class="field" for="hdl">Username, so friends can find you<input id="hdl" maxlength="15" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="letters, numbers, _" value="' + esc(d.handle) + '"></label>' : '') +
+      '<div class="field">Your picture' + avGrid(d.av) + '</div>' +
+      '<p id="pmsg" role="status">' + esc(msg || (on ? '' : 'Friends are not available right now. Your name and picture are saved on this device.')) + '</p>' +
+      (recLines.length ? '<p>Your record against ' + esc(recLines.join(' · ')) + '</p>' : '') +
+      '<button class="primary" id="go" type="button">Save</button><button class="second" id="pcancel" type="button">Cancel</button>' +
+      (on && me ? '<button class="second danger" id="pdel" type="button">Delete my account</button>' : ''));
+    var pick = d.av;
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-av]'), function(b){
+      b.onclick = function(){ pick = +b.dataset.av; Array.prototype.forEach.call($('box').querySelectorAll('[data-av]'), function(x){ x.setAttribute('aria-checked', x === b); }); };
+    });
+    var close = function(){ sheetKind = ''; $('sheet').hidden = true; if (screen === 'home') drawHome(); };
+    $('pcancel').onclick = close;
+    $('go').onclick = function(){
+      var name = cleanName($('nick').value), handle = on ? $('hdl').value.trim().toLowerCase().replace(/^@/, '') : '';
+      var keep = {name:name, handle:handle, av:pick};
+      if (!name) return profileSheet('Enter a name.', keep);
+      nick = name; myAv = pick; try { localStorage.setItem(NKEY, nick); localStorage.setItem('solo400av', myAv); } catch(e){}
+      if (!on) return close();
+      if (!/^[a-z0-9_]{3,15}$/.test(handle)) return profileSheet('A username is 3 to 15 letters, numbers or underscores.', keep);
+      $('go').disabled = true; $('pmsg').textContent = 'Saving…';
+      fb().saveProfile(name, handle, pick).then(function(){ me = {uid:fb().uid(), name:name, handle:handle, avatar:pick}; close(); })
+        .catch(function(e){ profileSheet(e && e.message === 'taken' ? 'That username is taken. Try another.' : 'Could not save. Check your connection and try again.', keep); });
+    };
+    if ($('pdel')) $('pdel').onclick = function(){
+      if (this.dataset.sure !== '1') { this.dataset.sure = '1'; this.textContent = 'Tap again to delete your account and friends list'; return; }
+      this.disabled = true;
+      fb().deleteAccount(me.handle).then(function(){ me = null; friends = []; invites = []; close(); }).catch(function(){ profileSheet('Could not delete the account. Try again.'); });
+    };
+  }
+  function frow(f, btns){
+    var p = profs[f.uid] || {name:'Player', handle:'', avatar:0};
+    return '<div class="frow">' + avatar(0, p.avatar | 0) + '<div><strong>' + esc(cleanName(p.name) || 'Player') + '</strong><span>' + (p.handle ? '@' + esc(p.handle) : '') + '</span></div>' + btns + '</div>';
+  }
+  function friendsSheet(msg){
+    if (!(fbUp && fb())) { openSheet('friends', '<h2>Friends</h2><p>Friends are not available right now. Check your connection and reopen the game.</p><button class="primary" id="go" type="button">Close</button>'); $('go').onclick = closeSheet; return; }
+    if (!me) { openSheet('friends', '<h2>Friends</h2><p>Pick a name and a username first, so friends can find you.</p><button class="primary" id="go" type="button">Set up my profile</button><button class="second" id="fx" type="button">Close</button>'); $('go').onclick = function(){ profileSheet(); }; $('fx').onclick = closeSheet; return; }
+    var inc = friends.filter(function(f){ return f.status === 'pending' && !f.mine; }), out = friends.filter(function(f){ return f.status === 'pending' && f.mine; }), acc = friends.filter(function(f){ return f.status === 'accepted'; });
+    var h = '<h2>Friends</h2><p>Your username is <b>@' + esc(me.handle) + '</b>. Friends add you with it.</p>' +
+      '<form id="fadd" class="joinrow" style="margin:0 0 6px"><input id="fname" maxlength="16" placeholder="Friend’s username" autocapitalize="none" autocomplete="off" spellcheck="false" aria-label="Friend’s username" style="text-transform:none;letter-spacing:0"><button class="second" type="submit">Add</button></form>' +
+      '<p id="fmsg" role="status">' + esc(msg || fbMsg) + '</p>';
+    fbMsg = '';
+    if (inc.length) { h += '<h3 class="fh">Requests</h3>'; inc.forEach(function(f){ h += frow(f, '<button class="primary" type="button" data-acc="' + f.uid + '">Accept</button><button class="ghost" type="button" data-rm="' + f.uid + '">Decline</button>'); }); }
+    h += '<h3 class="fh">Your friends</h3>';
+    if (!acc.length) h += '<p>No friends yet. Add one by username.</p>';
+    acc.forEach(function(f){ h += frow(f, '<button class="ghost" type="button" data-rm="' + f.uid + '">Remove</button>'); });
+    if (out.length) { h += '<h3 class="fh">Sent</h3>'; out.forEach(function(f){ h += frow(f, '<button class="ghost" type="button" data-rm="' + f.uid + '">Cancel</button>'); }); }
+    openSheet('friends', h + '<button class="primary" id="go" type="button" style="margin-top:12px">Done</button>');
+    $('go').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; if (screen === 'lobby') inviteSheet(); };
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-acc],[data-rm]'), function(b){
+      b.onclick = function(){ b.disabled = true; (b.dataset.acc ? fb().acceptFriend(b.dataset.acc) : fb().removeFriend(b.dataset.rm)).catch(function(){ friendsSheet('That did not go through. Try again.'); }); };
+    });
+    $('fadd').onsubmit = function(e){
+      e.preventDefault();
+      var hname = $('fname').value.trim().toLowerCase().replace(/^@/, '');
+      if (!/^[a-z0-9_]{3,15}$/.test(hname)) return friendsSheet('Enter your friend’s username.');
+      if (hname === me.handle) return friendsSheet('That is your own username.');
+      $('fmsg').textContent = 'Looking…';
+      fb().findByHandle(hname).then(function(p){
+        if (!p) return friendsSheet('No player has the username @' + hname + '.');
+        profs[p.uid] = p;
+        var ex = friends.filter(function(f){ return f.uid === p.uid; })[0];
+        if (ex && ex.status === 'accepted') return friendsSheet('You are already friends with @' + hname + '.');
+        if (ex && ex.mine) return friendsSheet('You already sent @' + hname + ' a request.');
+        return (ex ? fb().acceptFriend(p.uid) : fb().requestFriend(p.uid)).then(function(){ fbMsg = ex ? 'You are now friends with @' + hname + '.' : 'Request sent to @' + hname + '.'; document.activeElement && document.activeElement.blur(); friendsSheet(); });
+      }).catch(function(){ friendsSheet('Could not send the request. Try again.'); });
+    };
+  }
+  function inviteSheet(){
+    var on = fbUp && fb() && me, acc = friends.filter(function(f){ return f.status === 'accepted'; });
+    var h = '<h2>Invite friends</h2><div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div><button class="second" id="invite" type="button">Share a link</button></div>';
+    if (on) {
+      if (!acc.length) h += '<p>You have no friends added yet.</p>';
+      acc.forEach(function(f){ h += frow(f, invited[code + f.uid] ? '<button class="ghost" type="button" disabled>Invited</button>' : '<button class="primary" type="button" data-inv="' + f.uid + '">Invite</button>'); });
+      h += '<p style="margin-top:10px">Invited friends see it on their home screen when they open the game.</p>';
+    } else h += '<p>' + (fbUp && fb() ? 'Set up your profile to invite friends by username.' : 'Share the link or the code with your friends.') + '</p>';
+    h += '<button class="second" id="fmore" type="button">' + (on ? 'Add a friend' : 'Set up my profile') + '</button><button class="primary" id="go" type="button" style="margin-top:12px">Done</button>';
+    openSheet('invitef', h);
+    wireCommon($('box'));
+    $('go').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; };
+    $('fmore').onclick = function(){ if (on) friendsSheet(); else if (fbUp && fb()) profileSheet(); else { sheetKind = ''; $('sheet').hidden = true; } };
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-inv]'), function(b){
+      b.onclick = function(){
+        b.disabled = true; b.textContent = 'Sending…';
+        fb().sendInvite(b.dataset.inv, code, nick || me.name).then(function(){ invited[code + b.dataset.inv] = 1; inviteSheet(); }).catch(function(){ b.disabled = false; b.textContent = 'Try again'; });
+      };
+    });
   }
   function startSolo(fresh){
     closeNet(); mode = 'solo'; myPeer = 'host'; mySeat = 0; g = null;
@@ -935,7 +1142,7 @@ if (typeof module !== 'undefined') module.exports = E;
       var v = view(), host = mode === 'host', open = [0,1,2,3].filter(isBot).length, n = peersNow.length;
       h += '<div class="ltable">' + lseat((v + 2) & 3, 'top') + lseat((v + 3) & 3, 'left') + lseat((v + 1) & 3, 'right') + '<div class="lmenu">' +
         (host ? '<button class="primary" id="start" type="button">Start game</button>' : '<p>Waiting for ' + esc(hostName || 'the host') + ' to start the game.</p>') +
-        '<button class="primary alt" id="invite" type="button">Invite friends</button>' +
+        '<button class="primary alt" id="inviteF" type="button">Invite friends</button>' +
         '<button class="second" id="lset" type="button">Table settings</button>' +
         '<p>Bots take any open seat when the game starts.</p></div></div>';
       if (mySeat >= 0) h += '<div class="lme">' + avatar(mySeat) + '<div><strong>' + esc(nick || (host ? 'Host' : 'You')) + ' (you)</strong><span>' +
@@ -956,6 +1163,7 @@ if (typeof module !== 'undefined') module.exports = E;
     $('leaveL').onclick = goHome;
     if ($('start')) $('start').onclick = function(){ newGame(); show('table'); };
     if ($('lset')) $('lset').onclick = lobbySettings;
+    if ($('inviteF')) $('inviteF').onclick = inviteSheet;
   }
   function lobbySettings(){
     openSheet('lset', '<h2>Table settings</h2><div class="codebar"><div><span>Table code</span><b>' + esc(code) + '</b></div></div>' +
@@ -1398,7 +1606,22 @@ if (typeof module !== 'undefined') module.exports = E;
     setTimeout(function(){ armed = 0; b.textContent = 'Home'; }, 3000);
   };
   $('rulesBtn').onclick = rulesSheet;
-  $('hProfile').onclick = profileSheet; $('hRules').onclick = rulesSheet;
+  $('hProfile').onclick = $('hGear').onclick = $('hTabP').onclick = function(){ profileSheet(); };
+  $('hRules').onclick = rulesSheet; $('hFr').onclick = $('hBell').onclick = function(){ friendsSheet(); };
+  $('hJoinBtn').onclick = function(){
+    openSheet('join', '<h2>Join a table</h2><p>Enter the four-character code your friend sent you.</p><form id="hJoin" class="joinrow" style="margin:0 0 14px"><input id="hCode" maxlength="4" placeholder="Table code" autocapitalize="characters" autocomplete="off" aria-label="Table code"><button class="primary" type="submit" style="width:auto;padding:12px 18px">Join</button></form><button class="second" id="go" type="button">Cancel</button>');
+    $('go').onclick = closeSheet;
+    $('hJoin').onsubmit = function(e){ e.preventDefault(); var c = $('hCode').value; sheetKind = ''; $('sheet').hidden = true; $('hNote').textContent = ''; joinLobby(c); };
+  };
+  $('hSkill').onclick = function skill(){
+    openSheet('skill', '<h2>Bot skill</h2><p>How strong each bot is in your next game. You can change it again before every game.</p>' + lvRows([2,1,3], ['your partner','on your right','on your left']) + '<button class="primary" id="go" type="button">Done</button>');
+    wireLv($('box'), skill); $('go').onclick = closeSheet;
+  };
+  $('hRecord').onclick = function(){
+    openSheet('rec', '<h2>My record</h2>' + (recLines.length ? '<ul><li>' + recLines.map(esc).join('</li><li>') + '</li></ul>' : '<p>Finish a game against bots and your record shows here.</p>') + '<button class="primary" id="go" type="button">Done</button>');
+    $('go').onclick = closeSheet;
+  };
+  if (document.readyState === 'complete') startFB(); else window.addEventListener('load', startFB);
   $('botsBtn').onclick = botsSheet;
   $('tableBtn').onclick = function(){
     // from a game against bots: open the same game to friends, who can take over bot chairs
@@ -1408,12 +1631,13 @@ if (typeof module !== 'undefined') module.exports = E;
   $('hBots').onclick = function(){ startSolo(false); };
   $('hNew').onclick = function(){ startSolo(true); };
   $('hFriends').onclick = hostLobby;
-  $('hJoin').onsubmit = function(e){ e.preventDefault(); $('hNote').textContent = ''; joinLobby($('hCode').value); };
 
   var m = /[?&]room=([A-Za-z0-9]{4})/.exec(location.search);
   if (m) joinLobby(m[1]); else show('home');
 })();
 </script>
+<script>window.FB_CONFIG={"apiKey":"AIzaSyDHJ48VhshwtCiHjx_xRAay9AOfK8WeI0U","authDomain":"tarneeb-400.firebaseapp.com","projectId":"tarneeb-400","storageBucket":"tarneeb-400.firebasestorage.app","messagingSenderId":"310530099773","appId":"1:310530099773:web:6edc7cc0a4cb4c1ff7f854","measurementId":"G-XJMCMSRK8V"};</script>
+<script src="fb.js" defer></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 </body>
 </html>
