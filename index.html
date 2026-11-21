@@ -1135,7 +1135,7 @@ if (typeof module !== 'undefined') module.exports = E;
       fbUp = true;
       F.getProfile(uid).then(function(p){
         me = p;
-        if (p) { nick = cleanName(p.name); myAv = p.avatar | 0; try { localStorage.setItem(NKEY, nick); localStorage.setItem('solo400av', myAv); } catch(e){} }
+        if (p) { nick = cleanName(p.name); myAv = p.avatar | 0; try { localStorage.setItem(NKEY, nick); localStorage.setItem('solo400av', myAv); } catch(e){} pushSetup(true); }
         if (screen === 'home') drawHome();
       }).catch(function(){});
       F.watchFriends(function(list){
@@ -1157,6 +1157,18 @@ if (typeof module !== 'undefined') module.exports = E;
         drawFriendsHome();
       });
     });
+  }
+  /* iPhone app only: ask to send notifications, then keep this phone's address on the account so invites can reach it */
+  var pushWired = false;
+  function pushSetup(ask){
+    var M = NATIVE && CAP.Plugins && CAP.Plugins.FirebaseMessaging;
+    if (!M || !myUid() || !fb().savePushToken) return;
+    var keep = function(){ M.getToken().then(function(r){ if (r && r.token) fb().savePushToken(r.token).catch(function(){}); }).catch(function(){}); };
+    if (!pushWired) { pushWired = true; try { M.addListener('tokenReceived', function(e){ if (e && e.token && myUid()) fb().savePushToken(e.token).catch(function(){}); }); } catch(e){} }
+    M.checkPermissions().then(function(p){
+      if (p.receive === 'granted') keep();
+      else if (ask && p.receive !== 'denied') M.requestPermissions().then(function(q){ if (q.receive === 'granted') keep(); }).catch(function(){});
+    }).catch(function(){});
   }
   function drawFriendsHome(){
     if (!$('hFr')) return;
@@ -1214,7 +1226,7 @@ if (typeof module !== 'undefined') module.exports = E;
       if (!on) return close();
       if (!/^[a-z0-9_]{3,15}$/.test(handle)) return profileSheet('A username is 3 to 15 letters, numbers or underscores.', keep);
       $('go').disabled = true; $('pmsg').textContent = 'Saving…';
-      fb().saveProfile(name, handle, pick).then(function(){ me = {uid:fb().uid(), name:name, handle:handle, avatar:pick}; close(); })
+      fb().saveProfile(name, handle, pick).then(function(){ me = {uid:fb().uid(), name:name, handle:handle, avatar:pick}; pushSetup(true); close(); })
         .catch(function(e){ profileSheet(e && e.message === 'taken' ? 'That username is taken. Try another.' : 'Could not save. Check your connection and try again.', keep); });
     };
     if ($('pdel')) $('pdel').onclick = function(){
@@ -1268,8 +1280,7 @@ if (typeof module !== 'undefined') module.exports = E;
     if (on) {
       if (!acc.length) h += '<p>You have no friends added yet.</p>';
       acc.forEach(function(f){ h += frow(f, invited[code + f.uid] ? '<button class="ghost" type="button" disabled>Invited</button>' : '<button class="primary" type="button" data-inv="' + f.uid + '">Invite</button>'); });
-      h += '<p style="margin-top:10px">Invited friends see it on their home screen when they open the game.</p>';
-    } else h += '<p>' + (fbUp && fb() ? 'Set up your profile to invite friends by username.' : 'Share the link with your friends.') + '</p>';
+    } else if (fbUp && fb()) h += '<p>Set up your profile to invite friends by username.</p>';
     h += tail + '<button class="second" id="fmore" type="button">' + (on ? 'Add a friend' : 'Set up my profile') + '</button><button class="primary" id="go" type="button" style="margin-top:12px">Done</button>';
     openSheet('invitef', h);
     wireCommon($('box'));
@@ -1361,14 +1372,14 @@ if (typeof module !== 'undefined') module.exports = E;
     });
   }
   function codeBar(){
-    return '<div class="codebar quiet"><div><span>Not friends yet? Send a link, or give them the code <b>' + esc(code) + '</b></span></div><button class="second" id="invite" type="button">Share a link</button></div>';
+    return '<button class="second" id="invite" type="button" data-code="' + esc(code) + '">Share link and table code</button>';
   }
   function wireCommon(root){
     var inv = root.querySelector('#invite');
     if (inv) inv.onclick = function(){
       var url = location.origin + location.pathname + '?room=' + code, b = this;
       if (navigator.share) navigator.share({title:'400', text:'Join my 400 table. Code ' + code, url:url}).catch(function(){});
-      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ b.textContent = 'Link copied'; }).catch(function(){ b.textContent = code; });
+      else if (navigator.clipboard) navigator.clipboard.writeText('Join my 400 table. Code ' + code + ' ' + url).then(function(){ b.textContent = 'Copied. Paste it in a message'; }).catch(function(){ b.textContent = 'Could not copy'; });
     };
     var n = root.querySelector('#nick');
     if (n) {

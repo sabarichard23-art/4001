@@ -2,9 +2,29 @@
   "appId": "com.richardsaba.tarneeb400",
   "appName": "400",
   "webDir": "www",
-  "backgroundColor": "#0d1014",
+  "backgroundColor": "#1F2023",
   "ios": {
     "contentInset": "never",
-    "backgroundColor": "#0d1014"
+    "backgroundColor": "#1F2023"
+  },
+  "plugins": {
+    "FirebaseMessaging": {
+      "presentationOptions": [
+        "alert",
+        "badge",
+        "sound"
+      ]
+    }
+  },
+  "experimental": {
+    "ios": {
+      "spm": {
+        "packageOptions": {
+          "@capacitor-firebase/messaging": {
+            "symlink": true
+          }
+        }
+      }
+    }
   }
 }
