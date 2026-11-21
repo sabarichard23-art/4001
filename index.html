@@ -837,7 +837,7 @@ if (typeof module !== 'undefined') module.exports = E;
       if (g.tid !== tid || g.turn !== p || !isBot(p)) return;
       if (g.phase === 'bid') placeBid(p, E.chooseBid({me:p, hand:g.hands[p], bids:g.bids.slice(), voids:g.voids, first:g.first}, g.scores, lv[p]));
       else playCard(p, E.choosePlay(viewFor(p), 450, lv[p]));
-    }, window.BOT_MS != null ? window.BOT_MS : 1500 + Math.random() * 500);
+    }, window.BOT_MS != null ? window.BOT_MS : 1000 + Math.random() * 250);
   }
   function placeBid(p, b){
     if (g.phase !== 'bid' || g.turn !== p || b !== (b|0) || b < E.minBid(g.scores[p]) || b > 13) return;
