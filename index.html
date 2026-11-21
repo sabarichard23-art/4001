@@ -1165,15 +1165,33 @@ if (typeof module !== 'undefined') module.exports = E;
   }
   /* iPhone app only: ask to send notifications, then keep this phone's address on the account so invites can reach it */
   var pushWired = false;
+  /* Each step of notification sign-up is recorded so Settings can show exactly where it stands. */
+  var pushLog = {};
+  function pushNote(k, v){ pushLog[k] = String(v == null ? '' : v).slice(0, 90); if (sheetKind === 'settings' && !$('sheet').hidden) settingsSheet(); }
+  function errText(e){ return (e && (e.message || e.errorMessage || e.code)) || String(e || 'failed'); }
   function pushSetup(ask){
+    pushLog = {};
+    pushNote('app', NATIVE ? 'iPhone app' : 'web version');
+    pushNote('bridge', CAP && CAP.nativePromise ? 'yes' : 'no');
+    pushNote('profile', myUid() ? 'yes' : 'no');
     if (!NATIVE || !CAP.nativePromise || !myUid() || !fb().savePushToken) return;
     var M = 'FirebaseMessaging';
-    var keep = function(){ nat(M, 'getToken').then(function(r){ if (r && r.token) fb().savePushToken(r.token).catch(function(){}); }).catch(function(){}); };
-    if (!pushWired && CAP.addListener) { pushWired = true; try { CAP.addListener(M, 'tokenReceived', function(e){ if (e && e.token && myUid()) fb().savePushToken(e.token).catch(function(){}); }); } catch(e){} }
+    var keep = function(){
+      nat(M, 'getToken').then(function(r){
+        pushNote('address', r && r.token ? 'received' : 'empty');
+        if (r && r.token) fb().savePushToken(r.token).then(function(){ pushNote('saved', 'yes'); }).catch(function(e){ pushNote('saved', 'error: ' + errText(e)); });
+      }).catch(function(e){ pushNote('address', 'error: ' + errText(e)); });
+    };
+    if (!pushWired && CAP.addListener) { pushWired = true; try { CAP.addListener(M, 'tokenReceived', function(e){ if (e && e.token && myUid()) fb().savePushToken(e.token).then(function(){ pushNote('saved', 'yes'); }).catch(function(){}); }); } catch(e){} }
+    var request = function(){
+      nat(M, 'requestPermissions').then(function(q){ pushNote('permission', q && q.receive); if (q && q.receive === 'granted') keep(); })
+        .catch(function(e){ pushNote('permission', 'error: ' + errText(e)); });
+    };
     nat(M, 'checkPermissions').then(function(p){
+      pushNote('permission', p && p.receive);
       if (p && p.receive === 'granted') keep();
-      else if (ask && (!p || p.receive !== 'denied')) nat(M, 'requestPermissions').then(function(q){ if (q && q.receive === 'granted') keep(); }).catch(function(){});
-    }).catch(function(){});
+      else if (ask && (!p || p.receive !== 'denied')) request();
+    }).catch(function(e){ pushNote('permission', 'check error: ' + errText(e)); if (ask) request(); });
   }
   function drawFriendsHome(){
     if (!$('hFr')) return;
@@ -1926,15 +1944,23 @@ if (typeof module !== 'undefined') module.exports = E;
     try { localStorage.setItem('solo400theme', theme); localStorage.setItem('solo400oval', oval ? '1' : '0'); } catch(e){}
   }
   applyTheme();
+  function pushStatus(){
+    var o = [];
+    if (pushLog.profile === 'no') return 'Set up your profile first. Notifications are tied to your account.';
+    ['app','bridge','profile','permission','address','saved'].forEach(function(k){ if (pushLog[k] != null) o.push(k + ': ' + pushLog[k]); });
+    return o.length ? o.join(' \u00b7 ') : 'Not checked yet.';
+  }
   function settingsSheet(){
     var h = '<h2>Settings</h2><h3 class="fh" style="margin-top:6px">Colours</h3><div class="swatches">';
     THEMES.forEach(function(t){ h += '<button type="button" class="sw" data-th="' + t[0] + '" aria-pressed="' + (theme === t[0]) + '"><i style="background:' + t[3] + ';border-color:' + t[4] + ';box-shadow:0 0 0 6px ' + t[2] + '"></i>' + t[1] + '</button>'; });
     h += '</div><h3 class="fh">Table shape</h3><div class="seg two"><button type="button" data-ov="0" aria-pressed="' + !oval + '">Rounded</button><button type="button" data-ov="1" aria-pressed="' + oval + '">Oval</button></div>' +
+      (NATIVE ? '<h3 class="fh">Notifications</h3><p id="pstat" style="font-size:12px;line-height:1.5;margin:0 0 8px">' + esc(pushStatus()) + '</p><button class="second" id="pushOn" type="button" style="margin-bottom:12px">Turn on invite notifications</button>' : '') +
       (screen === 'home' ? '<button class="second" id="sprof" type="button">Edit my profile</button>' : '') + '<button class="primary" id="go" type="button" style="margin-top:10px">Done</button>';
     openSheet('settings', h);
     Array.prototype.forEach.call($('box').querySelectorAll('[data-th]'), function(b){ b.onclick = function(){ theme = b.dataset.th; applyTheme(); settingsSheet(); }; });
     Array.prototype.forEach.call($('box').querySelectorAll('[data-ov]'), function(b){ b.onclick = function(){ oval = b.dataset.ov === '1'; applyTheme(); settingsSheet(); }; });
     if ($('sprof')) $('sprof').onclick = function(){ profileSheet(); };
+    if ($('pushOn')) $('pushOn').onclick = function(){ if (!myUid()) { pushLog = {profile:'no'}; settingsSheet(); return; } pushSetup(true); };
     $('go').onclick = closeSheet;
   }
   function menu(open){ $('menu').hidden = !open; $('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false'); }
