@@ -462,8 +462,14 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .pick .emo-pick{background:#25272B;color:#F2F2F2;box-shadow:none;border-radius:14px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;font-weight:600;line-height:1.2;min-height:112px}
 .pick .emo-pick svg{pointer-events:none}
 .pick.words button{box-shadow:none;border:1px solid var(--line)}
-.bub.emo-b{background:none;border:0;box-shadow:none;padding:0;max-width:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
-.bub.emo-b.p0{left:6px;bottom:6px}.bub.emo-b.p1{right:-30px;top:calc(50% - 150px)}.bub.emo-b.p2{left:calc(50% + 34px);top:-70px}.bub.emo-b.p3{left:-30px;top:calc(50% - 150px)}
+/* emote in a square white chat bubble, centred on the player, with a tail pointing at them */
+.bub.emo-b{background:#fff;border:0;border-radius:0;box-shadow:none;padding:6px 6px 3px;max-width:none;width:84px;box-sizing:border-box;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
+.bub.emo-b svg{margin:0 auto}
+.bub.emo-b::after{content:"";position:absolute;width:0;height:0;border:9px solid transparent}
+.bub.emo-b.p2{left:50%;margin-left:-42px;right:auto;top:58px}.bub.emo-b.p2::after{left:50%;margin-left:-9px;top:-17px;border-bottom-color:#fff}
+.bub.emo-b.p3{left:40px;right:auto;top:calc(50% - 64px)}.bub.emo-b.p3::after{left:-17px;top:50%;margin-top:-9px;border-right-color:#fff}
+.bub.emo-b.p1{right:40px;left:auto;top:calc(50% - 64px)}.bub.emo-b.p1::after{right:-17px;top:50%;margin-top:-9px;border-left-color:#fff}
+.bub.emo-b.p0{left:50%;margin-left:-42px;right:auto;bottom:14px;top:auto}.bub.emo-b.p0::after{left:50%;margin-left:-9px;bottom:-17px;border-top-color:#fff}
 .log .lemo{display:flex;align-items:flex-end;gap:10px}.log .lemo svg{flex:none}
 .skillbtn{margin-top:3px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 8px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;min-height:44px;justify-content:center;color:var(--text);white-space:nowrap}
 .skillbtn b{font-size:12px;font-weight:600}.skillbtn span{font-size:11px;font-weight:600;color:var(--accent)}
@@ -1488,7 +1494,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function showSay(p, k, v){
     if (k === 't' && NATIVE) return;
     var t = sayText(k, v); if (!t) return;
-    if (k === 'e') { bubble(p, '', 'emo-b', 2600); $('bub' + pos(p)).innerHTML = emoSvg(v|0, 76); }
+    if (k === 'e') { bubble(p, '', 'emo-b', 2600); $('bub' + pos(p)).innerHTML = emoSvg(v|0, 72); }
     else bubble(p, t, '', k === 't' ? 5500 : 3200);
     chatLog.push([p === mySeat ? 'You' : (g.nm[p] || BOT[p]), t, k === 'e' ? (v|0) : -1]); if (chatLog.length > 30) chatLog.shift();
     if (sheetKind === 'chat' && chatTab === 't' && document.activeElement !== $('chatIn')) chatSheet();
