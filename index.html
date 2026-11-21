@@ -465,6 +465,10 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .bub.emo-b{background:none;border:0;box-shadow:none;padding:0;max-width:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
 .bub.emo-b.p0{left:6px;bottom:6px}.bub.emo-b.p1{right:-30px;top:calc(50% - 150px)}.bub.emo-b.p2{left:calc(50% + 34px);top:-70px}.bub.emo-b.p3{left:-30px;top:calc(50% - 150px)}
 .log .lemo{display:flex;align-items:flex-end;gap:10px}.log .lemo svg{flex:none}
+.skillbtn{margin-top:3px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 8px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;min-height:44px;justify-content:center;color:var(--text);white-space:nowrap}
+.skillbtn b{font-size:12px;font-weight:600}.skillbtn span{font-size:11px;font-weight:600;color:var(--accent)}
+.lseat{width:106px}.lseat.top{margin-left:-53px}.lseat.left{left:-45px}.lseat.right{right:-45px}.lmenu{width:172px;padding:12px}.skillbtn{padding:5px 5px 6px}.skillbtn span{font-size:10.5px}
+.skills{display:flex;flex-direction:column;gap:8px}.skills .second,.skills .primary{margin:0;min-height:52px;font-size:16px;font-weight:600}
 </style>
 </head>
 <body>
@@ -1346,7 +1350,8 @@ if (typeof module !== 'undefined') module.exports = E;
   function lseat(p, where){
     var team = ((p - view()) & 1) ? '' : ' us';
     if (!isBot(p)) return '<div class="lseat ' + where + team + '">' + avatar(p) + '<div class="nm">' + esc(g.nm[p] || 'Friend') + '</div><div class="tally">Ready</div></div>';
-    return '<div class="lseat ' + where + team + '"><button type="button" class="plus" data-sit="' + p + '" aria-label="Sit in this seat">+</button><div class="nm">Open seat</div><div class="tally">' + LEVELS[lv[p]] + ' bot</div></div>';
+    return '<div class="lseat ' + where + team + '"><button type="button" class="plus" data-sit="' + p + '" aria-label="Sit in this seat">+</button><div class="nm">Open seat</div>' +
+      (mode === 'host' ? '<button type="button" class="skillbtn" data-skill="' + p + '"><b>' + LEVELS[lv[p]] + ' bot</b><span>Change skill level</span></button>' : '<div class="tally">' + LEVELS[lv[p]] + ' bot</div>') + '</div>';
   }
   function drawLobby(){
     if (screen !== 'lobby') return;
@@ -1370,16 +1375,25 @@ if (typeof module !== 'undefined') module.exports = E;
         '</span></div><button class="ghost" type="button" data-stand="1">Stand up</button></div>';
       else h += '<div class="lme"><div><strong>You are watching</strong><span>' + (isBot(v) ? 'The seat in front of you is open' : esc(g.nm[v] || 'A friend') + ' has this seat') + '</span></div>' +
         (isBot(v) ? '<button class="ghost" type="button" data-sit="' + v + '">Sit here</button>' : '') + '</div>';
-      if (host) { var l2 = lv2(v, isBot); if (l2) h += '<div class="lcard">' + l2 + '</div>'; }
     }
     $('lobbyBox').innerHTML = h;
     wireCommon($('lobbyBox'));
     Array.prototype.forEach.call($('lobbyBox').querySelectorAll('[data-sit],[data-stand]'), function(b){ b.onclick = function(){ sit(b.dataset.stand ? -1 : +b.dataset.sit); }; });
-    wireLv2($('lobbyBox'), view(), function(){ drawLobby(); publish(); });
+    Array.prototype.forEach.call($('lobbyBox').querySelectorAll('[data-skill]'), function(b){ b.onclick = function(){ skillSheet(+b.dataset.skill); }; });
     $('leaveL').onclick = goHome;
     if ($('start')) $('start').onclick = function(){ newGame(); show('table'); };
     if ($('lset')) $('lset').onclick = lobbySettings;
     if ($('inviteF')) $('inviteF').onclick = inviteSheet;
+  }
+  function skillSheet(p){
+    var h = '<h2>Skill level</h2><p>How strong the bot in this seat plays.</p><div class="skills">';
+    LEVELS.forEach(function(n, l){ h += '<button type="button" class="' + (lv[p] === l ? 'primary' : 'second') + '" data-l="' + l + '" aria-pressed="' + (lv[p] === l) + '">' + n + '</button>'; });
+    openSheet('skill1', h + '</div><button class="second" id="go" type="button" style="margin-top:14px">Cancel</button>');
+    var close = function(){ sheetKind = ''; $('sheet').hidden = true; drawLobby(); };
+    $('go').onclick = close;
+    Array.prototype.forEach.call($('box').querySelectorAll('.skills button'), function(b){
+      b.onclick = function(){ lv[p] = +b.dataset.l; try { localStorage.setItem(LKEY, JSON.stringify(lv)); } catch(e){} close(); publish(); };
+    });
   }
   function lobbySettings(){
     openSheet('lset', '<h2>Table settings</h2>' +
