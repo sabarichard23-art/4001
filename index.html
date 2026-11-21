@@ -117,6 +117,7 @@ footer{padding:8px 6px 10px;background:linear-gradient(180deg,transparent,rgba(0
 #hand .card .pip{font-size:72px;right:8px}
 #hand .card.ok{transform:translateY(-12px)}
 #hand .card.no{filter:brightness(.58)}
+#hand .card.q{transform:translateY(-40px);box-shadow:0 0 0 3px var(--brass),0 0 18px var(--brass),0 8px 16px rgba(0,0,0,.6)}
 #hand button.card{appearance:none;text-align:left}
 
 #sheet{position:absolute;inset:0;background:rgba(6,8,11,.8);z-index:10;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -656,7 +657,9 @@ if (typeof module !== 'undefined') module.exports = E;
 <script src="mqtt.min.js"></script>
 <script>
 (function(){
+  var BOT_NAMES = ['Rami','Dana','Tarek','Sami','Karim','Layla','Omar','Nour','Hadi','Maya','Ziad','Rania','Fadi','Lina','Samir','Yara','Walid','Hala','Nabil','Salma','Jad','Farah','Bassam','Dina','Khalil','Mona','Hassan','Amal','Majed','Rima','Yousef','Zein','Tala','Ghassan','Huda','Marwan','Samar','Bilal','Reem','Anas'];
   var BOT = ['Sami', 'Dana', 'Rami', 'Tarek'];
+  function pickBots(){ BOT = E.shuffle(BOT_NAMES.slice()).slice(0, 4); }
   var RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
   var SUITS = ['♠︎','♥︎','♦︎','♣︎'];
   var OFF = [[0,60],[66,0],[0,-60],[-66,0]];               // trick card offsets by screen position: bottom, right, top, left
@@ -682,7 +685,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return '&#' + c.charCodeAt(0) + ';'; }); }
   function cleanName(t){ return String(t == null ? '' : t).replace(/[^\w À-ɏ؀-ۿ.'-]/g, '').trim().slice(0, 12); }
   function later(fn, ms){ var t = gen; setTimeout(function(){ if (t === gen) fn(); }, ms); }
-  function save(){ if (mode !== 'solo' || !g) return; try { localStorage.setItem(KEY, JSON.stringify({scores:g.scores, dealer:g.dealer})); } catch(e){} }
+  function save(){ if (mode !== 'solo' || !g) return; try { localStorage.setItem(KEY, JSON.stringify({scores:g.scores, dealer:g.dealer, bots:BOT})); } catch(e){} }
   function load(){ try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.scores && s.scores.length === 4 && E.gameWinner(s.scores) < 0) return s; } catch(e){} return null; }
   function isBot(p){ return g.seats[p] === ''; }
   function nm(p){ return p === mySeat ? 'You' : (g.nm[p] || BOT[p]); }
@@ -796,8 +799,32 @@ if (typeof module !== 'undefined') module.exports = E;
   function startSolo(fresh){
     closeNet(); mode = 'solo'; myPeer = 'host'; mySeat = 0; g = null;
     var s = fresh ? null : load();
+    if (!s) { pickBots(); preGame(); return; }
     show('table');
-    if (s) { g = blank([myPeer,'','',''], ['','','','']); g.scores = s.scores; g.dealer = s.dealer; gen++; sched = -1; startRound(); } else newGame();
+    if (s.bots && s.bots.length === 4) BOT = s.bots.map(cleanName); else pickBots();
+    g = blank([myPeer,'','',''], ['','','','']); g.scores = s.scores; g.dealer = s.dealer; gen++; sched = -1; startRound();
+  }
+  function lvRows(seats, where){
+    var h = '';
+    seats.forEach(function(p, i){
+      h += '<div class="lvrow"><h3>' + esc(BOT[p]) + ' <span>' + where[i] + '</span></h3><div class="seg">';
+      LEVELS.forEach(function(n, l){ h += '<button type="button" data-p="' + p + '" data-l="' + l + '" aria-pressed="' + (lv[p] === l) + '">' + n + '</button>'; });
+      h += '</div></div>';
+    });
+    return h;
+  }
+  function wireLv(root, again){
+    Array.prototype.forEach.call(root.querySelectorAll('.seg button'), function(b){
+      b.onclick = function(){ lv[+b.dataset.p] = +b.dataset.l; try { localStorage.setItem(LKEY, JSON.stringify(lv)); } catch(e){} again(); };
+    });
+  }
+  function preGame(){
+    openSheet('pre', '<h2>Before you start</h2><p>Pick how strong each bot is for this game.</p>' +
+      lvRows([2,1,3], ['your partner','on your right','on your left']) +
+      '<button class="primary" id="pgStart" type="button">Start game</button><button class="second" id="pgBack" type="button">Back</button>');
+    wireLv($('box'), preGame);
+    $('pgStart').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; show('table'); newGame(); };
+    $('pgBack').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; };
   }
   function chairsHtml(){
     var h = '<div class="chairs">';
@@ -871,7 +898,7 @@ if (typeof module !== 'undefined') module.exports = E;
     if ($('start')) $('start').onclick = function(){ newGame(); show('table'); };
   }
   function hostLobby(){
-    closeNet(); mode = 'host'; myPeer = 'host'; mySeat = 0; gen++; sched = -1;
+    closeNet(); mode = 'host'; myPeer = 'host'; mySeat = 0; gen++; sched = -1; pickBots();
     g = blank(['host','','',''], [nick || 'Host','','','']);
     show('lobby'); openHost();
   }
@@ -1048,7 +1075,7 @@ if (typeof module !== 'undefined') module.exports = E;
     var seat = g.seats.indexOf(c);
     return {hs:hs, n:++outN, host:nick || 'Host', tid:g.tid, ph:g.phase, sc:g.scores, dl:g.dealer,
       b:g.bids.map(function(x){ return x == null ? -1 : x; }), w:g.won, tr:g.trick.map(function(t){ return [t.p, t.c]; }),
-      tn:g.turn, wc:g.winCard, col:g.collect, note:g.note || 0, seats:g.seats, nm:g.nm, sum:g.sum || 0, lv:lv,
+      tn:g.turn, wc:g.winCard, col:g.collect, note:g.note || 0, seats:g.seats, nm:g.nm, sum:g.sum || 0, lv:lv, bn:BOT,
       say:(g.say || [0,0,0,0]).map(function(x){ return x && Date.now() - x[3] < 4000 ? [x[0], x[1], x[2]] : 0; }),
       h:g.hands.map(function(h, i){ return i === seat ? h : h.length; })};
   }
@@ -1112,6 +1139,7 @@ if (typeof module !== 'undefined') module.exports = E;
       if (ng.trick.length > prevLen) ng.fresh = ng.trick[ng.trick.length - 1].c;
       if (s.lv && s.lv.length === 4) lv = s.lv.map(function(x){ return Math.max(0, Math.min(3, x|0)); });
       hostName = cleanName(s.host);
+      if (s.bn && s.bn.length === 4) BOT = s.bn.map(function(x){ return cleanName(x) || 'Bot'; });
       g = ng; mySeat = g.seats.indexOf(myPeer);
       var scr = g.phase === 'lobby' ? 'lobby' : 'table';
       if (scr !== screen) { sheetKind = ''; $('sheet').hidden = true; show(scr); }
@@ -1225,7 +1253,7 @@ if (typeof module !== 'undefined') module.exports = E;
     if (mode === 'client') { myAct = {tid:g.tid, k:k, v:v}; sentTid = g.tid; pushClient(); $('pad').hidden = true; drawHand(); }
     else if (k === 'b') placeBid(mySeat, v); else playCard(mySeat, v);
   }
-  var dragging = false, handDirty = false;
+  var dragging = false, handDirty = false, queued = -1, firing = -1;
   function dragify(el, c){
     var sx = 0, sy = 0, pid = null, moved = false;
     function done(){ pid = null; dragging = false; el.classList.remove('drag', 'go'); el.style.transform = ''; }
@@ -1255,6 +1283,15 @@ if (typeof module !== 'undefined') module.exports = E;
     var cards = g.hands[mySeat].slice().sort(function(a,b){ return order.indexOf(E.S(a)) - order.indexOf(E.S(b)) || a - b; });
     var myTurn = g.phase === 'play' && myTurnNow();
     var legal = myTurn ? E.legalMoves(g.hands[mySeat], g.trick.map(function(t){ return t.c; })) : [];
+    if (queued >= 0 && (g.phase !== 'play' || cards.indexOf(queued) < 0)) queued = -1;
+    if (myTurn && queued >= 0) {
+      var qc = queued, qt = g.tid; queued = -1;
+      if (legal.indexOf(qc) >= 0) {
+        firing = qc;
+        setTimeout(function(){ firing = -1; if (g && g.tid === qt && g.phase === 'play' && myTurnNow() && g.hands[mySeat].indexOf(qc) >= 0) act('p', qc); }, 350);
+      } else { $('msg').textContent = 'Your queued card cannot follow this trick. Pick another.'; }
+    }
+    if (firing >= 0 && !myTurn) firing = -1;
     var W = box.clientWidth, n = cards.length;
     var cw = window.innerHeight <= 700 ? 84 : 106;
     var step = n > 1 ? Math.min(cw * 0.7, (W - cw) / (n - 1)) : 0;
@@ -1266,8 +1303,12 @@ if (typeof module !== 'undefined') module.exports = E;
       var el = cardEl(c, 'button'); el.type = 'button';
       el.style.left = (x0 + i * step) + 'px'; el.style.zIndex = i + 1;
       if (myTurn) {
-        if (legal.indexOf(c) >= 0) { el.classList.add('ok'); dragify(el, c); }
+        if (legal.indexOf(c) >= 0) { el.classList.add('ok'); if (c === firing) el.classList.add('q'); dragify(el, c); }
         else { el.classList.add('no'); el.disabled = true; }
+      } else if (g.phase === 'play' && cards.length > 0 && !(mode === 'client' && sentTid === g.tid)) {
+        if (c === queued) { el.classList.add('q'); el.setAttribute('aria-pressed', 'true'); }
+        el.setAttribute('aria-label', (c === queued ? 'Queued: ' : 'Queue ') + (el.getAttribute('aria-label') || 'card'));
+        el.onclick = function(){ queued = queued === c ? -1 : c; drawHand(); };
       } else el.disabled = true;
       box.appendChild(el);
     });
