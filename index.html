@@ -464,6 +464,7 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .pick.words button{box-shadow:none;border:1px solid var(--line)}
 .bub.emo-b{background:none;border:0;box-shadow:none;padding:0;max-width:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
 .bub.emo-b.p0{left:6px;bottom:6px}.bub.emo-b.p1{right:-30px;top:calc(50% - 150px)}.bub.emo-b.p2{left:calc(50% + 34px);top:-70px}.bub.emo-b.p3{left:-30px;top:calc(50% - 150px)}
+.log .lemo{display:flex;align-items:flex-end;gap:10px}.log .lemo svg{flex:none}
 </style>
 </head>
 <body>
@@ -1475,7 +1476,7 @@ if (typeof module !== 'undefined') module.exports = E;
     var t = sayText(k, v); if (!t) return;
     if (k === 'e') { bubble(p, '', 'emo-b', 2600); $('bub' + pos(p)).innerHTML = emoSvg(v|0, 76); }
     else bubble(p, t, '', k === 't' ? 5500 : 3200);
-    chatLog.push([p === mySeat ? 'You' : (g.nm[p] || BOT[p]), t]); if (chatLog.length > 30) chatLog.shift();
+    chatLog.push([p === mySeat ? 'You' : (g.nm[p] || BOT[p]), t, k === 'e' ? (v|0) : -1]); if (chatLog.length > 30) chatLog.shift();
     if (sheetKind === 'chat' && chatTab === 't' && document.activeElement !== $('chatIn')) chatSheet();
   }
   function recordSay(p, k, v){
@@ -1497,7 +1498,7 @@ if (typeof module !== 'undefined') module.exports = E;
     tabs.forEach(function(t){ h += '<button type="button" data-tab="' + t[0] + '" aria-pressed="' + (chatTab === t[0]) + '">' + t[1] + '</button>'; });
     h += '</div>';
     if (chatTab === 't') {
-      h += '<div class="log">' + (chatLog.length ? chatLog.slice(-8).map(function(x){ return '<p><b>' + esc(x[0]) + '</b> ' + esc(x[1]) + '</p>'; }).join('') : '<p>No messages yet.</p>') + '</div>';
+      h += '<div class="log">' + (chatLog.length ? chatLog.slice(-8).map(function(x){ return x[2] >= 0 ? '<p class="lemo"><b>' + esc(x[0]) + '</b>' + emoSvg(x[2], 44) + '</p>' : '<p><b>' + esc(x[0]) + '</b> ' + esc(x[1]) + '</p>'; }).join('') : '<p>No messages yet.</p>') + '</div>';
       h += '<form id="chatForm" class="joinrow"><input id="chatIn" maxlength="60" placeholder="Type a message" autocomplete="off" aria-label="Message" style="text-transform:none;letter-spacing:0"><button class="second" type="submit">Send</button></form>';
     } else {
       h += '<div class="pick' + (chatTab === 'm' ? ' words' : '') + '">';
