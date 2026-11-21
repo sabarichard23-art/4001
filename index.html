@@ -1110,15 +1110,15 @@ if (typeof module !== 'undefined') module.exports = E;
   function drawHome(){
     var s = load();
     if (!$('hFrs').innerHTML) drawFriendsHome();
-    var w = 0, l = 0, lines = [];
-    try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) { w += r[0]; l += r[1]; lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); } }); } catch(e){}
+    var w = 0, l = 0, lines = []; recRows = [];
+    try { var rec = JSON.parse(localStorage.getItem(RKEY) || '{}'); [3,2,1,0].forEach(function(i){ var r = rec['L' + i]; if (r) { w += r[0]; l += r[1]; recRows.push([LEVELS[i], r[0], r[1]]); lines.push(LEVELS[i] + ' bots: ' + r[0] + (r[0] === 1 ? ' win, ' : ' wins, ') + r[1] + (r[1] === 1 ? ' loss' : ' losses')); } }); } catch(e){}
     $('hAv').innerHTML = avatar(0);
     $('hName').textContent = nick || 'Player';
     $('hRec').textContent = (w + l) ? w + (w === 1 ? ' win' : ' wins') + ' · ' + l + (l === 1 ? ' loss' : ' losses') + ' vs bots' : 'No games finished yet';
     recLines = lines;
     drawFriendsHome();
   }
-  var recLines = [];
+  var recLines = [], recRows = [];
   /* ---------- accounts, friends and invites (Firebase) ---------- */
   var me = null, fbUp = false, friends = [], invites = [], profs = {}, invited = {}, fbMsg = '', series = [];
   function fb(){ return window.FB || null; }
@@ -1196,7 +1196,6 @@ if (typeof module !== 'undefined') module.exports = E;
       (on ? '<label class="field" for="hdl">Username, so friends can find you<input id="hdl" maxlength="15" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="letters, numbers, _" value="' + esc(d.handle) + '"></label>' : '') +
       '<div class="field">Your picture' + avGrid(d.av) + '</div>' +
       '<p id="pmsg" role="status">' + esc(msg || (on ? '' : 'Friends are not available right now. Your name and picture are saved on this device.')) + '</p>' +
-      (recLines.length ? '<p>Your record against ' + esc(recLines.join(' · ')) + '</p>' : '') +
       '<button class="primary" id="go" type="button">Save</button><button class="second" id="pcancel" type="button">Cancel</button>' +
       (on && me ? '<button class="second danger" id="pdel" type="button">Delete my account</button>' : ''));
     var pick = d.av;
@@ -1941,13 +1940,12 @@ if (typeof module !== 'undefined') module.exports = E;
     var uid = myUid(), h = '<h2>My record</h2>';
     var who = function(ids){ return ids.length ? ids.map(function(id){ return id === uid ? 'You' : esc(cleanName((profs[id] || {}).name) || 'Player'); }).join(' + ') : 'bots'; };
     var rows = series.slice().sort(function(a, b){ return b.at - a.at; });
-    h += '<h3 class="fh">Series</h3>';
-    if (!rows.length) h += '<p>' + (uid ? 'Finish a game with friends who have a profile and the series shows here. Each exact line-up keeps its own score.' : 'Set up your profile to keep a series score with your friends.') + '</p>';
     rows.forEach(function(s){
       var mine = s.t0.indexOf(uid) >= 0 ? 0 : 1, a = mine ? s.t1 : s.t0, b = mine ? s.t0 : s.t1, wa = mine ? s.w1 : s.w0, wb = mine ? s.w0 : s.w1;
       h += '<div class="srs"><div><strong>' + who(a) + '</strong><span>vs ' + who(b) + '</span></div><b class="' + (wa > wb ? 'up' : wa < wb ? 'down' : '') + '" aria-label="' + wa + ' wins, ' + wb + ' losses">' + wa + '\u2013' + wb + '</b></div>';
     });
-    h += '<h3 class="fh">On your own against bots</h3>' + (recLines.length ? '<ul><li>' + recLines.map(esc).join('</li><li>') + '</li></ul>' : '<p>Finish a game against bots and your record shows here.</p>');
+    recRows.forEach(function(r){ h += '<div class="srs"><div><strong>You</strong><span>vs ' + r[0] + ' bots</span></div><b class="' + (r[1] > r[2] ? 'up' : r[1] < r[2] ? 'down' : '') + '" aria-label="' + r[1] + ' wins, ' + r[2] + ' losses">' + r[1] + '\u2013' + r[2] + '</b></div>'; });
+    if (!rows.length && !recRows.length) h += '<p>No games finished yet.</p>';
     openSheet('rec', h + '<button class="primary" id="go" type="button">Done</button>');
     $('go').onclick = closeSheet;
   }
