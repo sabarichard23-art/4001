@@ -198,24 +198,6 @@ p.fine{margin:6px 0 0;text-align:center;font-size:12px}p.fine a{color:var(--mute
 @media (max-height:700px){#hand{height:132px}#hand .card{height:120px;width:84px}#hand .card .pip{font-size:48px}.av{width:50px;height:50px}.seat.top{top:-52px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
-/* A1: cleaner, sharper table with trick dots */
-#table{border-width:5px;border-radius:28px;background:linear-gradient(180deg,#1c9159,#137048) padding-box,linear-gradient(#33271b,#33271b) border-box;box-shadow:0 0 0 1px rgba(227,189,106,.55),0 8px 18px rgba(0,0,0,.45)}
-#table::before{border:1px solid rgba(255,255,255,.14);border-radius:18px}
-#table::after{display:none}
-.card{border-radius:7px;border:1px solid rgba(0,0,0,.28);box-shadow:0 1px 0 rgba(0,0,0,.35),0 3px 6px rgba(0,0,0,.28)}
-#hand .card{border-radius:9px;box-shadow:-3px 0 5px rgba(0,0,0,.3),0 2px 5px rgba(0,0,0,.3)}
-.ghost{background:transparent;border-color:#343c47;border-radius:8px}
-.av{border-width:2px;border-color:#0d1014;box-shadow:none}
-.seat.turn .av,#me.turn .av{border-color:#0d1014;box-shadow:0 0 0 2px #0d1014,0 0 0 4px var(--brass)}
-.nm{border-width:1px;border-radius:6px}
-.tally{background:#0d1014;border-radius:5px}
-#board{border-radius:8px}#board b{border-radius:4px}#board i{border-radius:3px;border:1px solid var(--brass);background:#1c9159}
-.dots{display:inline-flex;gap:4px;padding:4px 0;vertical-align:middle}
-.dots i{width:9px;height:9px;border-radius:50%;box-sizing:border-box;border:1.5px solid var(--brass);display:block}
-.dots i.on{background:var(--brass)}
-#me .dots i{width:11px;height:11px}
-.tally.got .dots i{border-color:#06301c}.tally.got .dots i.on{background:#06301c}
-.tally.dead .dots i{border-color:#fff}.tally.dead .dots i.on{background:#fff}
 </style>
 </head>
 <body>
@@ -1201,17 +1183,12 @@ if (typeof module !== 'undefined') module.exports = E;
     el.setAttribute('aria-label', RANKS[E.R(c)] + ' of ' + ['spades','hearts','diamonds','clubs'][s]);
     return el;
   }
-  function dots(won, bid){
-    var h = '<span class="dots" role="img" aria-label="' + won + ' of ' + bid + ' tricks">';
-    for (var i = 0; i < Math.max(bid, won); i++) h += '<i class="' + (i < won ? 'on' : '') + (i >= bid ? ' x' : '') + '"></i>';
-    return h + '</span>';
-  }
   function tally(p){
     var bid = g.bids[p];
     if (bid == null) return '<div class="tally">' + ((g.phase === 'bid' && g.turn === p) ? 'Bidding' : 'Waiting') + '</div>';
     var left = g.hands[p].length + (g.trick.some(function(t){ return t.p === p; }) ? 1 : 0);
     var st = g.won[p] >= bid ? ' got' : (g.won[p] + left < bid ? ' dead' : '');
-    return '<div class="tally' + st + '"' + (st ? ' aria-label="' + g.won[p] + ' of ' + bid + (st === ' got' ? ', bid made' : ', bid cannot be made') + '"' : '') + '>' + (bid <= 6 ? dots(g.won[p], bid) : '<b class="w">' + g.won[p] + '</b> of <b>' + bid + '</b>') + '</div>';
+    return '<div class="tally' + st + '"' + (st ? ' aria-label="' + g.won[p] + ' of ' + bid + (st === ' got' ? ', bid made' : ', bid cannot be made') + '"' : '') + '><b class="w">' + g.won[p] + '</b> of <b>' + bid + '</b></div>';
   }
   function seatHtml(p){
     var n = g.hands[p].length, k = Math.min(7, Math.ceil(n / 2)), fan = '';
