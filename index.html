@@ -980,7 +980,11 @@ if (typeof module !== 'undefined') module.exports = E;
   /* The iPhone app's bridge: call a native plugin directly. (Capacitor.Plugins is only filled in when the Capacitor JS library is loaded, and this page does not load it.) */
   function nat(plugin, method, opts){
     if (!NATIVE || !CAP.nativePromise) return Promise.reject(new Error('not native'));
-    try { return CAP.nativePromise(plugin, method, opts || {}); } catch(e){ return Promise.reject(e); }
+    /* the bridge never answers when a plugin is missing, so give up after a few seconds (not for the permission pop-up, which waits for the person) */
+    return new Promise(function(res, rej){
+      var t = method === 'requestPermissions' ? 0 : setTimeout(function(){ rej(new Error('no answer from the app')); }, 6000);
+      try { CAP.nativePromise(plugin, method, opts || {}).then(function(r){ clearTimeout(t); res(r); }, function(e){ clearTimeout(t); rej(e); }); } catch(e){ clearTimeout(t); rej(e); }
+    });
   }
   function buzz(){ nat('Haptics', 'impact', {style:'LIGHT'}).catch(function(){}); }
   var buzzedTid = -1;
@@ -1174,6 +1178,7 @@ if (typeof module !== 'undefined') module.exports = E;
     pushNote('app', NATIVE ? 'iPhone app' : 'web version');
     pushNote('bridge', CAP && CAP.nativePromise ? 'yes' : 'no');
     pushNote('profile', myUid() ? 'yes' : 'no');
+    if (NATIVE) nat('Haptics', 'impact', {style:'LIGHT'}).then(function(){ pushNote('haptics', 'ok'); }, function(e){ pushNote('haptics', errText(e)); });
     if (!NATIVE || !CAP.nativePromise || !myUid() || !fb().savePushToken) return;
     var M = 'FirebaseMessaging';
     var keep = function(){
@@ -1947,7 +1952,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function pushStatus(){
     var o = [];
     if (pushLog.profile === 'no') return 'Set up your profile first. Notifications are tied to your account.';
-    ['app','bridge','profile','permission','address','saved'].forEach(function(k){ if (pushLog[k] != null) o.push(k + ': ' + pushLog[k]); });
+    ['app','bridge','profile','haptics','permission','address','saved'].forEach(function(k){ if (pushLog[k] != null) o.push(k + ': ' + pushLog[k]); });
     return o.length ? o.join(' \u00b7 ') : 'Not checked yet.';
   }
   function settingsSheet(){
