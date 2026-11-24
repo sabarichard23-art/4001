@@ -488,6 +488,13 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .sw2 i{position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .15s}
 .sw2[aria-checked="true"]{background:#34c759}.sw2[aria-checked="true"] i{transform:translateX(22px)}
 #watch{flex-direction:column;gap:10px}#watch .primary{width:auto;min-height:44px;padding:0 22px;font-size:15px}
+#hand .card.back{padding:0;background:repeating-linear-gradient(45deg,transparent 0 6px,rgba(255,255,255,.07) 6px 12px),repeating-linear-gradient(-45deg,transparent 0 6px,rgba(255,255,255,.07) 6px 12px),var(--panel);border:3px solid #fff;box-shadow:-2px 0 4px rgba(0,0,0,.3),inset 0 0 0 2px var(--accent)}
+#hand .card.flip{animation:turnup .22s ease-out backwards}
+@keyframes turnup{from{transform:rotateY(88deg)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){#hand .card.flip{animation:none}}
+.seat.right .tally.tag{align-self:flex-end;margin-right:32px;min-width:56px;justify-content:center}
+.seat.left .tally.tag{align-self:flex-start;margin-left:32px;min-width:56px;justify-content:center}
+@media (max-height:700px){.seat.right .tally.tag{margin-right:35px;min-width:50px}.seat.left .tally.tag{margin-left:35px;min-width:50px}}
 </style>
 </head>
 <body>
@@ -1932,6 +1939,7 @@ if (typeof module !== 'undefined') module.exports = E;
     };
     el.onpointercancel = function(){ done(); };
   }
+  var wasDown = false;
   function drawHand(){
     if (dragging) { handDirty = true; return; }
     handDirty = false;
@@ -1942,6 +1950,9 @@ if (typeof module !== 'undefined') module.exports = E;
       $('takeSeat').onclick = function(){ $('tableBtn').onclick(); };
       return;
     }
+    /* Cards stay face down until it is this player's turn to call, and turn back over when the deal is thrown in. */
+    var down = (g.phase === 'bid' && g.bids[mySeat] == null && g.turn !== mySeat) || !!(g.note && g.note.k === 'redeal');
+    var flip = wasDown && !down; wasDown = down;
     var order = [1,0,2,3];
     var cards = g.hands[mySeat].slice().sort(function(a,b){ return order.indexOf(E.S(a)) - order.indexOf(E.S(b)) || a - b; });
     var myTurn = g.phase === 'play' && myTurnNow();
@@ -1963,8 +1974,14 @@ if (typeof module !== 'undefined') module.exports = E;
     box.style.setProperty('--rk', rkPx + 'px');
 
     cards.forEach(function(c, i){
+      if (down) {
+        var bk = document.createElement('div'); bk.className = 'card back'; bk.style.left = (x0 + i * step) + 'px'; bk.style.zIndex = i + 1;
+        if (!i) { bk.setAttribute('role', 'img'); bk.setAttribute('aria-label', 'Your cards are face down until it is your turn to call'); }
+        box.appendChild(bk); return;
+      }
       var el = cardEl(c, 'button'); el.type = 'button';
       el.style.left = (x0 + i * step) + 'px'; el.style.zIndex = i + 1;
+      if (flip) { el.classList.add('flip'); el.style.animationDelay = (i * 18) + 'ms'; }
       if (myTurn) {
         if (legal.indexOf(c) >= 0) { el.classList.add('ok'); if (c === firing) el.classList.add('q'); dragify(el, c); }
         else { el.classList.add('no'); el.disabled = true; }
