@@ -1176,25 +1176,29 @@ if (typeof module !== 'undefined') module.exports = E;
   function pushSetup(ask){
     pushLog = {};
     pushNote('app', NATIVE ? 'iPhone app' : 'web version');
-    pushNote('bridge', CAP && CAP.nativePromise ? 'yes' : 'no');
     pushNote('profile', myUid() ? 'yes' : 'no');
-    if (NATIVE) nat('Haptics', 'impact', {style:'LIGHT'}).then(function(){ pushNote('haptics', 'ok'); }, function(e){ pushNote('haptics', errText(e)); });
+    if (NATIVE) pushNote('plugins', (CAP.PluginHeaders || []).map(function(h){ return h.name; }).filter(function(n){ return /Push|Haptic|Firebase/.test(n); }).join(', ') || 'none listed');
     if (!NATIVE || !CAP.nativePromise || !myUid() || !fb().savePushToken) return;
-    var M = 'FirebaseMessaging';
-    var keep = function(){
-      nat(M, 'getToken').then(function(r){
-        pushNote('address', r && r.token ? 'received' : 'empty');
-        if (r && r.token) fb().savePushToken(r.token).then(function(){ pushNote('saved', 'yes'); }).catch(function(e){ pushNote('saved', 'error: ' + errText(e)); });
-      }).catch(function(e){ pushNote('address', 'error: ' + errText(e)); });
-    };
-    if (!pushWired && CAP.addListener) { pushWired = true; try { CAP.addListener(M, 'tokenReceived', function(e){ if (e && e.token && myUid()) fb().savePushToken(e.token).then(function(){ pushNote('saved', 'yes'); }).catch(function(){}); }); } catch(e){} }
+    var M = 'PushNotifications';
+    if (!pushWired && CAP.addListener) {
+      pushWired = true;
+      try {
+        CAP.addListener(M, 'registration', function(e){
+          var t = e && e.value;
+          pushNote('address', t ? 'received' : 'empty');
+          if (t && myUid()) fb().savePushToken(String(t)).then(function(){ pushNote('saved', 'yes'); }).catch(function(x){ pushNote('saved', 'error: ' + errText(x)); });
+        });
+        CAP.addListener(M, 'registrationError', function(e){ pushNote('address', 'error: ' + errText(e && (e.error || e))); });
+      } catch(e){}
+    }
+    var register = function(){ nat(M, 'register').catch(function(e){ pushNote('address', 'register error: ' + errText(e)); }); };
     var request = function(){
-      nat(M, 'requestPermissions').then(function(q){ pushNote('permission', q && q.receive); if (q && q.receive === 'granted') keep(); })
+      nat(M, 'requestPermissions').then(function(q){ pushNote('permission', q && q.receive); if (q && q.receive === 'granted') register(); })
         .catch(function(e){ pushNote('permission', 'error: ' + errText(e)); });
     };
     nat(M, 'checkPermissions').then(function(p){
       pushNote('permission', p && p.receive);
-      if (p && p.receive === 'granted') keep();
+      if (p && p.receive === 'granted') register();
       else if (ask && (!p || p.receive !== 'denied')) request();
     }).catch(function(e){ pushNote('permission', 'check error: ' + errText(e)); if (ask) request(); });
   }
@@ -1952,7 +1956,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function pushStatus(){
     var o = [];
     if (pushLog.profile === 'no') return 'Set up your profile first. Notifications are tied to your account.';
-    ['app','bridge','profile','haptics','permission','address','saved'].forEach(function(k){ if (pushLog[k] != null) o.push(k + ': ' + pushLog[k]); });
+    ['app','profile','plugins','permission','address','saved'].forEach(function(k){ if (pushLog[k] != null) o.push(k + ': ' + pushLog[k]); });
     return o.length ? o.join(' \u00b7 ') : 'Not checked yet.';
   }
   function settingsSheet(){
