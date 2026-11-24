@@ -8,23 +8,12 @@
     "backgroundColor": "#1F2023"
   },
   "plugins": {
-    "FirebaseMessaging": {
+    "PushNotifications": {
       "presentationOptions": [
-        "alert",
         "badge",
-        "sound"
+        "sound",
+        "alert"
       ]
-    }
-  },
-  "experimental": {
-    "ios": {
-      "spm": {
-        "packageOptions": {
-          "@capacitor-firebase/messaging": {
-            "symlink": true
-          }
-        }
-      }
     }
   }
 }
