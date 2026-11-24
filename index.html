@@ -487,6 +487,7 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .sw2{width:54px;height:32px;border-radius:16px;border:0;padding:0;background:var(--surface);position:relative;flex:none;transition:background .15s}
 .sw2 i{position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .15s}
 .sw2[aria-checked="true"]{background:#34c759}.sw2[aria-checked="true"] i{transform:translateX(22px)}
+#watch{flex-direction:column;gap:10px}#watch .primary{width:auto;min-height:44px;padding:0 22px;font-size:15px}
 </style>
 </head>
 <body>
@@ -527,7 +528,7 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
     <div class="stack">
       <div class="htop">
         <button class="hprof" id="hProfile" type="button" aria-label="Your profile"><span id="hAv"></span><span class="hwho"><strong id="hName">Player</strong><span id="hRec"></span></span></button>
-        <button class="hic" id="hBell" type="button" aria-label="Friend requests and invites"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="hBadge" hidden></b></button>
+        <button class="hic" id="hBell" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="hBadge" hidden></b></button>
         <button class="hic" id="hGear" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4L18 18M18 6l-1.6 1.6M7.6 16.4L6 18"/></svg></button>
       </div>
       <div id="hInv" aria-live="polite"></div>
@@ -1140,7 +1141,7 @@ if (typeof module !== 'undefined') module.exports = E;
   function typing(){ var ae = document.activeElement; return ae && ae.tagName === 'INPUT' && $('box').contains(ae); }
   function refreshSheets(){
     if ($('sheet').hidden || typing()) return;
-    if (sheetKind === 'friends') friendsSheet(); else if (sheetKind === 'invitef') inviteSheet();
+    if (sheetKind === 'friends') friendsSheet(); else if (sheetKind === 'invitef') inviteSheet(); else if (sheetKind === 'notif') notifSheet();
   }
   function startFB(){
     var F = fb(); if (!F) return;
@@ -1166,8 +1167,9 @@ if (typeof module !== 'undefined') module.exports = E;
       F.watchInvites(function(list){
         if (!list) return;
         var now = Date.now();
-        invites = list.filter(function(v){ if (now - v.at > 15 * 60000) { F.deleteInvite(v.id).catch(function(){}); return false; } return true; });
-        drawFriendsHome();
+        invites = list.filter(function(v){ if (now - v.at > 12 * 3600000) { F.deleteInvite(v.id).catch(function(){}); return false; } return true; }).sort(function(a, b){ return b.at - a.at; });
+        invites.forEach(function(v){ if (!profs[v.from]) F.getProfile(v.from).then(function(p){ if (p) { profs[v.from] = p; drawFriendsHome(); refreshSheets(); } }).catch(function(){}); });
+        drawFriendsHome(); refreshSheets();
       });
     });
   }
@@ -1212,14 +1214,15 @@ if (typeof module !== 'undefined') module.exports = E;
     var req = friends.filter(function(f){ return f.status === 'pending' && !f.mine; }).length;
     var n = friends.filter(function(f){ return f.status === 'accepted'; }).length;
     $('hFr').classList.toggle('dot', req > 0);
-    $('hBadge').hidden = !(req + invites.length); $('hBadge').textContent = req + invites.length;
+    var fresh = freshInvites();
+    $('hBadge').hidden = !(req + fresh.length); $('hBadge').textContent = req + fresh.length;
     $('hFrN').textContent = n ? n + (n === 1 ? ' friend' : ' friends') : (req ? req + (req === 1 ? ' request' : ' requests') : '');
     var fs = '';
     friends.forEach(function(f){ if (f.status !== 'accepted') return; var p = profs[f.uid] || {name:'Player', avatar:0}; fs += '<button class="hf" type="button">' + avatar(0, p.avatar | 0) + '<span>' + esc(cleanName(p.name) || 'Player') + '</span></button>'; });
     $('hFrs').innerHTML = fs + '<button class="hf" type="button" aria-label="Add a friend"><span class="plus" aria-hidden="true">+</span><span>Add</span></button>';
     Array.prototype.forEach.call($('hFrs').querySelectorAll('button'), function(b){ b.onclick = function(){ friendsSheet(); }; });
     var h = '';
-    invites.forEach(function(v){
+    fresh.forEach(function(v){
       var ip = profs[v.from];
       h += '<div class="inv">' + (ip ? avatar(0, ip.avatar | 0) : '') + '<div><strong>' + esc(cleanName(v.fromName) || 'A friend') + ' invited you</strong><span>Waiting to start</span></div>' +
         '<button class="primary" type="button" data-join="' + esc(v.id) + '">Join</button><button class="ghost" type="button" data-skip="' + esc(v.id) + '" aria-label="Dismiss invite">Not now</button></div>';
@@ -1228,9 +1231,44 @@ if (typeof module !== 'undefined') module.exports = E;
     Array.prototype.forEach.call($('hInv').querySelectorAll('button'), function(b){
       b.onclick = function(){
         var id = b.dataset.join || b.dataset.skip, v = invites.filter(function(x){ return x.id === id; })[0];
-        invites = invites.filter(function(x){ return x.id !== id; });
-        if (fb()) fb().deleteInvite(id).catch(function(){});
+        markSeen(id);
         if (b.dataset.join && v) joinLobby(v.code); else drawFriendsHome();
+      };
+    });
+  }
+  /* Invites stay on the account for 12 hours so a table can be rejoined from Notifications.
+     The card on the home screen only shows for a new invite this phone has not answered yet. */
+  var seenInv = {};
+  try { seenInv = JSON.parse(localStorage.getItem('solo400inv') || '{}') || {}; } catch(e){}
+  function markSeen(id){
+    seenInv[id] = Date.now();
+    var keep = {}; Object.keys(seenInv).forEach(function(k){ if (Date.now() - seenInv[k] < 13 * 3600000) keep[k] = seenInv[k]; }); seenInv = keep;
+    try { localStorage.setItem('solo400inv', JSON.stringify(seenInv)); } catch(e){}
+  }
+  function freshInvites(){ var now = Date.now(); return invites.filter(function(v){ return !seenInv[v.id] && now - v.at < 15 * 60000; }); }
+  function ago(t){
+    var m = Math.max(0, Math.round((Date.now() - t) / 60000));
+    return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : Math.round(m / 60) + (Math.round(m / 60) === 1 ? ' hour ago' : ' hours ago');
+  }
+  function notifSheet(){
+    var inc = friends.filter(function(f){ return f.status === 'pending' && !f.mine; });
+    var h = '<h2>Notifications</h2>';
+    if (!inc.length && !invites.length) h += '<p>Nothing yet. Table invites and friend requests show up here.</p>';
+    inc.forEach(function(f){ h += frow(f, '<button class="primary" type="button" data-acc="' + f.uid + '">Accept</button><button class="ghost" type="button" data-rm="' + f.uid + '">Decline</button>').replace('</strong><span>', ' wants to be friends</strong><span>'); });
+    invites.forEach(function(v){
+      var ip = profs[v.from];
+      h += '<div class="frow">' + avatar(0, ip ? ip.avatar | 0 : 0) + '<div><strong>' + esc(cleanName(v.fromName) || 'A friend') + ' invited you</strong><span>' + ago(v.at) + '</span></div>' +
+        '<button class="' + (seenInv[v.id] ? 'ghost' : 'primary') + '" type="button" data-rejoin="' + esc(v.id) + '">' + (seenInv[v.id] ? 'Rejoin' : 'Join') + '</button></div>';
+    });
+    openSheet('notif', h + '<button class="primary" id="go" type="button" style="margin-top:12px">Done</button>');
+    $('go').onclick = closeSheet;
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-acc],[data-rm]'), function(b){
+      b.onclick = function(){ b.disabled = true; (b.dataset.acc ? fb().acceptFriend(b.dataset.acc) : fb().removeFriend(b.dataset.rm)).catch(function(){ notifSheet(); }); };
+    });
+    Array.prototype.forEach.call($('box').querySelectorAll('[data-rejoin]'), function(b){
+      b.onclick = function(){
+        var v = invites.filter(function(x){ return x.id === b.dataset.rejoin; })[0]; if (!v) return;
+        markSeen(v.id); sheetKind = ''; $('sheet').hidden = true; joinLobby(v.code);
       };
     });
   }
@@ -1291,7 +1329,7 @@ if (typeof module !== 'undefined') module.exports = E;
     if (out.length) { h += '<h3 class="fh">Sent</h3>'; out.forEach(function(f){ h += frow(f, '<button class="ghost" type="button" data-rm="' + f.uid + '">Cancel</button>'); }); }
     openSheet('friends', h + '<button class="primary" id="go" type="button" style="margin-top:12px">Done</button>' + (screen === 'home' ? JOINLINK : ''));
     wireJoin();
-    $('go').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; if (screen === 'lobby') inviteSheet(); };
+    $('go').onclick = function(){ sheetKind = ''; $('sheet').hidden = true; if (screen === 'lobby' || screen === 'table') inviteSheet(); };
     Array.prototype.forEach.call($('box').querySelectorAll('[data-acc],[data-rm]'), function(b){
       b.onclick = function(){ b.disabled = true; (b.dataset.acc ? fb().acceptFriend(b.dataset.acc) : fb().removeFriend(b.dataset.rm)).catch(function(){ friendsSheet('That did not go through. Try again.'); }); };
     });
@@ -1899,7 +1937,11 @@ if (typeof module !== 'undefined') module.exports = E;
     handDirty = false;
     var box = $('hand'); box.innerHTML = '';
     if (!g) return;
-    if (mySeat < 0) { box.innerHTML = '<div id="watch">You are watching. Tap Table to take a chair.</div>'; return; }
+    if (mySeat < 0) {
+      box.innerHTML = '<div id="watch"><span>You are watching this game.</span><button class="primary" id="takeSeat" type="button">Take a seat</button></div>';
+      $('takeSeat').onclick = function(){ $('tableBtn').onclick(); };
+      return;
+    }
     var order = [1,0,2,3];
     var cards = g.hands[mySeat].slice().sort(function(a,b){ return order.indexOf(E.S(a)) - order.indexOf(E.S(b)) || a - b; });
     var myTurn = g.phase === 'play' && myTurnNow();
@@ -1997,11 +2039,11 @@ if (typeof module !== 'undefined') module.exports = E;
   $('menu').addEventListener('click', function(e){ if (e.target.id !== 'homeBtn') menu(false); });
   $('table').addEventListener('pointerdown', function(){ menu(false); });
   $('setBtn').onclick = settingsSheet;
-  $('inviteIc').onclick = function(){ menu(false); $('tableBtn').onclick(); };
+  $('inviteIc').onclick = function(){ menu(false); if ((mode === 'host' || mode === 'client') && code) inviteSheet(); else $('tableBtn').onclick(); };
   $('rulesBtn').onclick = rulesSheet;
   $('hProfile').onclick = $('hTabP').onclick = function(){ profileSheet(); };
   $('hGear').onclick = settingsSheet;
-  $('hRules').onclick = rulesSheet; $('hFr').onclick = $('hBell').onclick = function(){ friendsSheet(); };
+  $('hRules').onclick = rulesSheet; $('hFr').onclick = function(){ friendsSheet(); }; $('hBell').onclick = notifSheet;
   var JOINLINK = '<p class="fine"><button type="button" class="linkbtn" id="fjoin">Have a table code? Join with it</button></p>';
   function wireJoin(){ if ($('fjoin')) $('fjoin').onclick = joinSheet; }
   function joinSheet(){
