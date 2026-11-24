@@ -483,6 +483,10 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 /* soft shadow so the white-outlined emotes lift off the white bubble */
 .bub.emo-b svg{filter:drop-shadow(0 1px 2.5px rgba(0,0,0,.38))}
 .hero .ht{margin-bottom:16px}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 12px;font-size:15px;font-weight:600}
+.sw2{width:54px;height:32px;border-radius:16px;border:0;padding:0;background:var(--surface);position:relative;flex:none;transition:background .15s}
+.sw2 i{position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .15s}
+.sw2[aria-checked="true"]{background:#34c759}.sw2[aria-checked="true"] i{transform:translateX(22px)}
 </style>
 </head>
 <body>
@@ -1179,6 +1183,7 @@ if (typeof module !== 'undefined') module.exports = E;
     pushNote('profile', myUid() ? 'yes' : 'no');
     if (NATIVE) pushNote('plugins', (CAP.PluginHeaders || []).map(function(h){ return h.name; }).filter(function(n){ return /Push|Haptic|Firebase/.test(n); }).join(', ') || 'none listed');
     if (!NATIVE || !CAP.nativePromise || !myUid() || !fb().savePushToken) return;
+    if (!pushWant) { nat('PushNotifications', 'checkPermissions').then(function(p){ pushNote('permission', p && p.receive); }).catch(function(){}); return; }
     var M = 'PushNotifications';
     if (!pushWired && CAP.addListener) {
       pushWired = true;
@@ -1953,6 +1958,17 @@ if (typeof module !== 'undefined') module.exports = E;
     try { localStorage.setItem('solo400theme', theme); localStorage.setItem('solo400oval', oval ? '1' : '0'); } catch(e){}
   }
   applyTheme();
+  var pushWant = true;
+  try { pushWant = localStorage.getItem('solo400push') !== '0'; } catch(e){}
+  function pushIsOn(){ return pushWant && pushLog.permission === 'granted'; }
+  /* one short line, only when the switch could not do what was asked */
+  function pushProblem(){
+    if (pushLog.profile === 'no') return 'Set up your profile first. Notifications are tied to your account.';
+    if (!pushWant) return '';
+    if (pushLog.permission === 'denied') return 'Notifications are turned off for this app in iPhone Settings. Turn them on there, then come back.';
+    var bad = ['permission','address','saved'].filter(function(k){ return /error|no answer/.test(pushLog[k] || ''); });
+    return bad.length ? 'Could not turn on notifications (' + pushStatus() + ').' : '';
+  }
   function pushStatus(){
     var o = [];
     if (pushLog.profile === 'no') return 'Set up your profile first. Notifications are tied to your account.';
@@ -1963,13 +1979,17 @@ if (typeof module !== 'undefined') module.exports = E;
     var h = '<h2>Settings</h2><h3 class="fh" style="margin-top:6px">Colours</h3><div class="swatches">';
     THEMES.forEach(function(t){ h += '<button type="button" class="sw" data-th="' + t[0] + '" aria-pressed="' + (theme === t[0]) + '"><i style="background:' + t[3] + ';border-color:' + t[4] + ';box-shadow:0 0 0 6px ' + t[2] + '"></i>' + t[1] + '</button>'; });
     h += '</div><h3 class="fh">Table shape</h3><div class="seg two"><button type="button" data-ov="0" aria-pressed="' + !oval + '">Rounded</button><button type="button" data-ov="1" aria-pressed="' + oval + '">Oval</button></div>' +
-      (NATIVE ? '<h3 class="fh">Notifications</h3><p id="pstat" style="font-size:12px;line-height:1.5;margin:0 0 8px">' + esc(pushStatus()) + '</p><button class="second" id="pushOn" type="button" style="margin-bottom:12px">Turn on invite notifications</button>' : '') +
+      (NATIVE ? '<div class="swrow"><span id="pushLbl">Invite notifications</span><button type="button" class="sw2" id="pushOn" role="switch" aria-labelledby="pushLbl" aria-checked="' + pushIsOn() + '"><i></i></button></div>' + (pushProblem() ? '<p id="pstat" style="font-size:12px;line-height:1.5;margin:0 0 10px">' + esc(pushProblem()) + '</p>' : '') : '') +
       (screen === 'home' ? '<button class="second" id="sprof" type="button">Edit my profile</button>' : '') + '<button class="primary" id="go" type="button" style="margin-top:10px">Done</button>';
     openSheet('settings', h);
     Array.prototype.forEach.call($('box').querySelectorAll('[data-th]'), function(b){ b.onclick = function(){ theme = b.dataset.th; applyTheme(); settingsSheet(); }; });
     Array.prototype.forEach.call($('box').querySelectorAll('[data-ov]'), function(b){ b.onclick = function(){ oval = b.dataset.ov === '1'; applyTheme(); settingsSheet(); }; });
     if ($('sprof')) $('sprof').onclick = function(){ profileSheet(); };
-    if ($('pushOn')) $('pushOn').onclick = function(){ if (!myUid()) { pushLog = {profile:'no'}; settingsSheet(); return; } pushSetup(true); };
+    if ($('pushOn')) $('pushOn').onclick = function(){
+      if (!myUid()) { pushLog = {profile:'no'}; settingsSheet(); return; }
+      if (pushIsOn()) { pushWant = false; try { localStorage.setItem('solo400push', '0'); } catch(e){} if (fb().clearPushTokens) fb().clearPushTokens().catch(function(){}); pushLog = {}; settingsSheet(); }
+      else { pushWant = true; try { localStorage.setItem('solo400push', '1'); } catch(e){} pushSetup(true); settingsSheet(); }
+    };
     $('go').onclick = closeSheet;
   }
   function menu(open){ $('menu').hidden = !open; $('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false'); }
