@@ -495,6 +495,9 @@ footer{padding:0;background:none;display:flex;flex-direction:column}
 .seat.right .tally.tag{align-self:flex-end;margin-right:32px;min-width:56px;justify-content:center}
 .seat.left .tally.tag{align-self:flex-start;margin-left:32px;min-width:56px;justify-content:center}
 @media (max-height:700px){.seat.right .tally.tag{margin-right:35px;min-width:50px}.seat.left .tally.tag{margin-left:35px;min-width:50px}}
+/* Table size is set outright from the screen width. Older iPhones worked the width out from the height when it was left to aspect-ratio, which pushed the table off the right edge. */
+#table{--tw:calc(min(100vw,540px) - 88px);aspect-ratio:auto;box-sizing:border-box;width:var(--tw);height:calc(var(--tw)*0.96);max-width:calc(100% - 88px);margin:auto;flex:0 1 auto}
+html,body{overflow-x:hidden}
 </style>
 </head>
 <body>
